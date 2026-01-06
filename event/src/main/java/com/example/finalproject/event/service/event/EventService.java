@@ -1,4 +1,4 @@
-package com.example.finalproject.event.service;
+package com.example.finalproject.event.service.event;
 
 import com.example.finalproject.event.dto.CreateEventRequest;
 import com.example.finalproject.event.exception.event.CategoryEventNotFoundException;
@@ -8,11 +8,9 @@ import com.example.finalproject.event.model.EventModel;
 import com.example.finalproject.event.model.LocationModel;
 import com.example.finalproject.event.model.TicketModel;
 import com.example.finalproject.event.repository.EventRepository;
-import com.example.finalproject.event.response.event.EventListItemResponse;
-import com.example.finalproject.event.response.event.EventResponse;
-import com.example.finalproject.event.response.event.LocationResponse;
-import com.example.finalproject.event.response.event.TicketResponse;
+import com.example.finalproject.event.response.event.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -20,10 +18,13 @@ import java.util.List;
 @Service
 public class EventService {
 
+    private final ImageService imageService;
     private final EventRepository eventRepository;
 
-    public EventService(EventRepository eventRepository) {
+    public EventService(EventRepository eventRepository,
+                        ImageService imageService) {
         this.eventRepository = eventRepository;
+        this.imageService = imageService;
     }
 
     public EventModel createEvent(CreateEventRequest request) {
@@ -137,4 +138,30 @@ public class EventService {
         eventRepository.deleteById(eventId);
     }
 
+
+    public String updateEventImage(Long eventId, MultipartFile image) {
+        EventModel event = eventRepository.findById(eventId)
+                .orElseThrow(EventNotFoundException::new);
+
+        String imageUrl = imageService.uploadEventImage(image);
+
+        event.setImageUrl(imageUrl);
+        eventRepository.save(event);
+
+        return imageUrl;
+    }
+
+    public EventImageResponse getEventImage(Long eventId) {
+        EventModel event = eventRepository.findById(eventId)
+                .orElseThrow(EventNotFoundException::new);
+
+        if (event.getImageUrl() == null || event.getImageUrl().isBlank()) {
+            throw new EventNotFoundException();
+        }
+
+        return new EventImageResponse(
+                event.getEventId(),
+                event.getImageUrl()
+        );
+    }
 }

@@ -34,6 +34,8 @@ public class EventModel {
     @Enumerated(EnumType.STRING)
     private EventCategories category;
 
+    private String imageUrl;
+
     @Future(message = "Event date must be in the future")
     private LocalDate date;
 

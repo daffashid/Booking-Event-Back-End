@@ -6,16 +6,14 @@
     import com.example.finalproject.event.model.EventCategories;
     import com.example.finalproject.event.model.EventModel;
     import com.example.finalproject.event.response.BaseResponse;
-    import com.example.finalproject.event.response.event.EventListItemResponse;
-    import com.example.finalproject.event.response.event.EventResponse;
-    import com.example.finalproject.event.response.event.LocationResponse;
-    import com.example.finalproject.event.response.event.TicketResponse;
-    import com.example.finalproject.event.service.EventService;
+    import com.example.finalproject.event.response.event.*;
+    import com.example.finalproject.event.service.event.EventService;
     import jakarta.validation.Valid;
     import org.springframework.http.HttpStatus;
     import org.springframework.http.ResponseEntity;
     import org.springframework.security.access.prepost.PreAuthorize;
     import org.springframework.web.bind.annotation.*;
+    import org.springframework.web.multipart.MultipartFile;
 
     import java.util.List;
 
@@ -173,4 +171,52 @@
                 );
             }
         }
+
+        @PatchMapping("/{id}/image")
+        @PreAuthorize("hasRole('ADMIN')")
+        public ResponseEntity<BaseResponse<String>> uploadEventImage(
+                @PathVariable Long id,
+                @RequestParam MultipartFile image
+        ) {
+            String imageUrl = eventService.updateEventImage(id, image);
+
+            return ResponseEntity.ok(
+                    new BaseResponse<>(
+                            true,
+                            "Event image updated",
+                            "00",
+                            imageUrl
+                    )
+            );
+        }
+
+        @GetMapping("/{id}/image")
+        public ResponseEntity<BaseResponse<EventImageResponse>> getEventImage(
+                @PathVariable Long id
+        ) {
+            try {
+                EventImageResponse image = eventService.getEventImage(id);
+
+                return ResponseEntity.ok(
+                        new BaseResponse<>(
+                                true,
+                                "Event image fetched successfully",
+                                "00",
+                                image
+                        )
+                );
+
+            } catch (EventNotFoundException e) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                        new BaseResponse<>(
+                                false,
+                                e.getMessage(),
+                                "01",
+                                null
+                        )
+                );
+            }
+        }
+
+
     }
