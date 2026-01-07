@@ -1,10 +1,10 @@
 package com.example.finalproject.event.service.event;
 
-import com.example.finalproject.event.dto.CreateEventRequest;
+import com.example.finalproject.event.dto.event.CreateEventRequest;
 import com.example.finalproject.event.dto.event.PatchEventRequest;
+import com.example.finalproject.event.dto.event.TicketRequest;
 import com.example.finalproject.event.dto.event.UpdateEventRequest;
-import com.example.finalproject.event.exception.event.CategoryEventNotFoundException;
-import com.example.finalproject.event.exception.event.EventNotFoundException;
+import com.example.finalproject.event.exception.event.*;
 import com.example.finalproject.event.model.EventCategories;
 import com.example.finalproject.event.model.EventModel;
 import com.example.finalproject.event.model.LocationModel;
@@ -13,8 +13,12 @@ import com.example.finalproject.event.repository.EventRepository;
 import com.example.finalproject.event.response.event.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -22,6 +26,7 @@ public class EventService {
 
     private final ImageService imageService;
     private final EventRepository eventRepository;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public EventService(EventRepository eventRepository,
                         ImageService imageService) {
@@ -29,43 +34,74 @@ public class EventService {
         this.imageService = imageService;
     }
 
-    public EventModel createEvent(CreateEventRequest request) {
+    public EventModel createEvent(CreateEventRequest request, MultipartFile image) {
 
-        LocationModel location = LocationModel.builder()
-                .venue(request.getVenue())
-                .address(request.getAddress())
-                .city(request.getCity())
-                .country(request.getCountry())
-                .build();
-
-        EventModel event = EventModel.builder()
-                .title(request.getTitle())
-                .shortSummary(request.getShortSummary())
-                .description(request.getDescription())
-                .category(request.getCategory())
-                .date(request.getDate())
-                .time(request.getTime())
-                .totalCapacity(request.getTotalCapacity())
-                .location(location)
-                .build();
-
-        if (request.getTickets() != null && !request.getTickets().isEmpty()) {
-
-            int ticketCount = request.getTickets().size();
-            int quantityPerTicket = request.getTotalCapacity() / ticketCount;
-
-            List<TicketModel> tickets = request.getTickets().stream()
-                    .map(t -> TicketModel.builder()
-                            .ticketName(t.getTicketName())
-                            .price(BigDecimal.valueOf(t.getPrice()))
-                            .quantity(quantityPerTicket)
-                            .event(event)
-                            .build()
-                    )
-                    .toList();
-
-            event.setTickets(tickets);
+        // ===== DATE =====
+        LocalDate date;
+        try {
+            date = LocalDate.parse(request.getDate());
+        } catch (Exception e) {
+            throw new InvalidDateException();
         }
+
+        if (!date.isAfter(LocalDate.now())) {
+            throw new InvalidDateException();
+        }
+
+        // ===== TIME =====
+        LocalTime time;
+        try {
+            time = LocalTime.parse(request.getTime());
+        } catch (Exception e) {
+            throw new InvalidTimeException();
+        }
+
+        // ===== TICKETS =====
+        List<TicketRequest> ticketRequests = request.getTickets();
+        if (ticketRequests == null || ticketRequests.isEmpty()) {
+            throw new InvalidTicketException("At least one ticket is required");
+        }
+
+        // ===== IMAGE =====
+        String imageUrl = null;
+        if (image != null && !image.isEmpty()) {
+            try {
+                imageUrl = imageService.uploadEventImage(image);
+            } catch (Exception e) {
+                throw new ImageUploadException();
+            }
+        }
+
+        // ===== LOCATION =====
+        LocationModel location = new LocationModel();
+        location.setVenue(request.getVenue());
+        location.setAddress(request.getAddress());
+        location.setCity(request.getCity());
+        location.setCountry(request.getCountry());
+
+        // ===== EVENT =====
+        EventModel event = new EventModel();
+        event.setTitle(request.getTitle());
+        event.setShortSummary(request.getShortSummary());
+        event.setDescription(request.getDescription());
+        event.setCategory(request.getCategory());
+        event.setDate(date);
+        event.setTime(time);
+        event.setTotalCapacity(request.getTotalCapacity());
+        event.setImageUrl(imageUrl);
+        event.setLocation(location);
+
+        // ===== TICKET MODEL =====
+        List<TicketModel> tickets = ticketRequests.stream().map(tr -> {
+            TicketModel ticket = new TicketModel();
+            ticket.setTicketName(tr.getTicketName());
+            ticket.setPrice(BigDecimal.valueOf(tr.getPrice()));
+            ticket.setQuantity(tr.getQuantity());
+            ticket.setEvent(event);
+            return ticket;
+        }).toList();
+
+        event.setTickets(tickets);
 
         return eventRepository.save(event);
     }
@@ -124,33 +160,6 @@ public class EventService {
         eventRepository.deleteById(eventId);
     }
 
-
-    public String updateEventImage(Long eventId, MultipartFile image) {
-        EventModel event = eventRepository.findById(eventId)
-                .orElseThrow(EventNotFoundException::new);
-
-        String imageUrl = imageService.uploadEventImage(image);
-
-        event.setImageUrl(imageUrl);
-        eventRepository.save(event);
-
-        return imageUrl;
-    }
-
-    public EventImageResponse getEventImage(Long eventId) {
-        EventModel event = eventRepository.findById(eventId)
-                .orElseThrow(EventNotFoundException::new);
-
-        if (event.getImageUrl() == null || event.getImageUrl().isBlank()) {
-            throw new EventNotFoundException();
-        }
-
-        return new EventImageResponse(
-                event.getEventId(),
-                event.getImageUrl()
-        );
-    }
-
     public EventResponse updateEvent(Long eventId, UpdateEventRequest request) {
 
         EventModel event = eventRepository.findById(eventId)
@@ -170,9 +179,12 @@ public class EventService {
         location.setCity(request.getCity());
         location.setCountry(request.getCountry());
 
-        eventRepository.save(event);
+        if (request.getImage() != null && !request.getImage().isEmpty()) {
+            String imageUrl = imageService.uploadEventImage(request.getImage());
+            event.setImageUrl(imageUrl);
+        }
 
-        return mapToEventResponse(event);
+        return mapToEventResponse(eventRepository.save(event));
     }
 
     public EventResponse patchEvent(Long eventId, PatchEventRequest request) {
@@ -211,9 +223,12 @@ public class EventService {
         if (request.getCountry() != null)
             location.setCountry(request.getCountry());
 
-        eventRepository.save(event);
+        if (request.getImage() != null && !request.getImage().isEmpty()) {
+            String imageUrl = imageService.uploadEventImage(request.getImage());
+            event.setImageUrl(imageUrl);
+        }
 
-        return mapToEventResponse(event);
+        return mapToEventResponse(eventRepository.save(event));
     }
 
     private EventResponse mapToEventResponse(EventModel event) {
@@ -221,6 +236,9 @@ public class EventService {
                 event.getEventId(),
                 event.getTitle(),
                 event.getCategory(),
+                event.getDate(),
+                event.getTime(),
+                event.getImageUrl(),
                 event.getTotalCapacity(),
                 new LocationResponse(
                         event.getLocation().getVenue(),

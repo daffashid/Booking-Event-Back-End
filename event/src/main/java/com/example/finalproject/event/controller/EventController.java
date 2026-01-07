@@ -1,10 +1,9 @@
     package com.example.finalproject.event.controller;
 
-    import com.example.finalproject.event.dto.CreateEventRequest;
+    import com.example.finalproject.event.dto.event.CreateEventRequest;
     import com.example.finalproject.event.dto.event.PatchEventRequest;
     import com.example.finalproject.event.dto.event.UpdateEventRequest;
-    import com.example.finalproject.event.exception.event.CategoryEventNotFoundException;
-    import com.example.finalproject.event.exception.event.EventNotFoundException;
+    import com.example.finalproject.event.exception.event.*;
     import com.example.finalproject.event.model.EventCategories;
     import com.example.finalproject.event.model.EventModel;
     import com.example.finalproject.event.response.BaseResponse;
@@ -12,6 +11,7 @@
     import com.example.finalproject.event.service.event.EventService;
     import jakarta.validation.Valid;
     import org.springframework.http.HttpStatus;
+    import org.springframework.http.MediaType;
     import org.springframework.http.ResponseEntity;
     import org.springframework.security.access.prepost.PreAuthorize;
     import org.springframework.web.bind.annotation.*;
@@ -29,40 +29,47 @@
             this.eventService = eventService;
         }
 
-        @PostMapping("/create")
+        @PostMapping(
+                value = "/create",
+                consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+        )
         @PreAuthorize("hasRole('ADMIN')")
-        public ResponseEntity<BaseResponse<EventResponse>> createEvent(
-                @Valid @RequestBody CreateEventRequest request
+        public ResponseEntity<BaseResponse<Object>> createEvent(
+                @Valid @ModelAttribute CreateEventRequest request,
+                @RequestPart(value = "image", required = false) MultipartFile image
         ) {
-            EventModel event = eventService.createEvent(request);
+            BaseResponse<Object> response = new BaseResponse<>();
 
-            EventResponse eventResponse = new EventResponse(
-                    event.getEventId(),
-                    event.getTitle(),
-                    event.getCategory(),
-                    event.getTotalCapacity(),
-                    new LocationResponse(
-                            event.getLocation().getVenue(),
-                            event.getLocation().getCity()
-                    ),
-                    event.getTickets().stream()
-                            .map(t -> new TicketResponse(
-                                    t.getTicketName(),
-                                    t.getPrice(),
-                                    t.getQuantity()
-                            ))
-                            .toList()
-            );
+            try {
+                response.setData(eventService.createEvent(request, image));
+                response.setSuccess(true);
+                response.setMessage("Event created successfully");
+                response.setErrorCode("00");
+                return ResponseEntity.ok(response);
 
-            BaseResponse<EventResponse> response =
-                    new BaseResponse<>(
-                            true,
-                            "Event created successfully",
-                            "00",
-                            eventResponse
-                    );
+            } catch (InvalidDateException e) {
+                response.setMessage(e.getMessage());
+                response.setErrorCode("01");
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            } catch (InvalidTimeException e) {
+                response.setMessage(e.getMessage());
+                response.setErrorCode("02");
+
+            } catch (InvalidTicketException e) {
+                response.setMessage(e.getMessage());
+                response.setErrorCode("03");
+
+            } catch (ImageUploadException e) {
+                response.setMessage(e.getMessage());
+                response.setErrorCode("04");
+
+            } catch (Exception e) {
+                response.setMessage("Something went wrong");
+                response.setErrorCode("99");
+            }
+
+            response.setSuccess(false);
+            return ResponseEntity.badRequest().body(response);
         }
 
         @GetMapping
@@ -174,57 +181,11 @@
             }
         }
 
-        @PatchMapping("/{id}/image")
+        @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
         @PreAuthorize("hasRole('ADMIN')")
-        public ResponseEntity<BaseResponse<String>> uploadEventImage(
-                @PathVariable Long id,
-                @RequestParam MultipartFile image
-        ) {
-            String imageUrl = eventService.updateEventImage(id, image);
-
-            return ResponseEntity.ok(
-                    new BaseResponse<>(
-                            true,
-                            "Event image updated",
-                            "00",
-                            imageUrl
-                    )
-            );
-        }
-
-        @GetMapping("/{id}/image")
-        public ResponseEntity<BaseResponse<EventImageResponse>> getEventImage(
-                @PathVariable Long id
-        ) {
-            try {
-                EventImageResponse image = eventService.getEventImage(id);
-
-                return ResponseEntity.ok(
-                        new BaseResponse<>(
-                                true,
-                                "Event image fetched successfully",
-                                "00",
-                                image
-                        )
-                );
-
-            } catch (EventNotFoundException e) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                        new BaseResponse<>(
-                                false,
-                                e.getMessage(),
-                                "01",
-                                null
-                        )
-                );
-            }
-        }
-
-
-        @PutMapping("/{id}")
         public ResponseEntity<BaseResponse<EventResponse>> updateEvent(
                 @PathVariable Long id,
-                @Valid @RequestBody UpdateEventRequest request
+                @Valid @ModelAttribute UpdateEventRequest request
         ) {
             return ResponseEntity.ok(
                     new BaseResponse<>(
@@ -236,11 +197,12 @@
             );
         }
 
-        @PatchMapping("/{id}")
+        @PatchMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+        @PreAuthorize("hasRole('ADMIN')")
         public ResponseEntity<BaseResponse<EventResponse>> patchEvent(
                 @PathVariable Long id,
-                @RequestBody PatchEventRequest request
-                ){
+                @ModelAttribute PatchEventRequest request
+        ) {
             return ResponseEntity.ok(
                     new BaseResponse<>(
                             true,
@@ -250,5 +212,4 @@
                     )
             );
         }
-        
     }

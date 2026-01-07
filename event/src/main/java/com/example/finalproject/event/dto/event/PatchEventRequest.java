@@ -2,6 +2,7 @@ package com.example.finalproject.event.dto.event;
 
 import com.example.finalproject.event.model.EventCategories;
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -12,6 +13,7 @@ public class PatchEventRequest {
     private String shortSummary;
     private String description;
     private EventCategories category;
+    private MultipartFile image;
     private LocalDate date;
     private LocalTime time;
     private Integer totalCapacity;
