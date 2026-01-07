@@ -1,6 +1,8 @@
 package com.example.finalproject.event.service.event;
 
 import com.example.finalproject.event.dto.CreateEventRequest;
+import com.example.finalproject.event.dto.event.PatchEventRequest;
+import com.example.finalproject.event.dto.event.UpdateEventRequest;
 import com.example.finalproject.event.exception.event.CategoryEventNotFoundException;
 import com.example.finalproject.event.exception.event.EventNotFoundException;
 import com.example.finalproject.event.model.EventCategories;
@@ -111,23 +113,7 @@ public class EventService {
         EventModel event = eventRepository.findById(id)
                 .orElseThrow(() -> new EventNotFoundException());
 
-        return new EventResponse(
-                event.getEventId(),
-                event.getTitle(),
-                event.getCategory(),
-                event.getTotalCapacity(),
-                new LocationResponse(
-                        event.getLocation().getVenue(),
-                        event.getLocation().getCity()
-                ),
-                event.getTickets().stream()
-                        .map(t -> new TicketResponse(
-                                t.getTicketName(),
-                                t.getPrice(),
-                                t.getQuantity()
-                        ))
-                        .toList()
-        );
+        return mapToEventResponse(event);
     }
 
     public void deleteEvent(Long eventId) {
@@ -162,6 +148,91 @@ public class EventService {
         return new EventImageResponse(
                 event.getEventId(),
                 event.getImageUrl()
+        );
+    }
+
+    public EventResponse updateEvent(Long eventId, UpdateEventRequest request) {
+
+        EventModel event = eventRepository.findById(eventId)
+                .orElseThrow(EventNotFoundException::new);
+
+        event.setTitle(request.getTitle());
+        event.setShortSummary(request.getShortSummary());
+        event.setDescription(request.getDescription());
+        event.setCategory(request.getCategory());
+        event.setDate(request.getDate());
+        event.setTime(request.getTime());
+        event.setTotalCapacity(request.getTotalCapacity());
+
+        LocationModel location = event.getLocation();
+        location.setVenue(request.getVenue());
+        location.setAddress(request.getAddress());
+        location.setCity(request.getCity());
+        location.setCountry(request.getCountry());
+
+        eventRepository.save(event);
+
+        return mapToEventResponse(event);
+    }
+
+    public EventResponse patchEvent(Long eventId, PatchEventRequest request) {
+
+        EventModel event = eventRepository.findById(eventId)
+                .orElseThrow(EventNotFoundException::new);
+
+        if (request.getTitle() != null)
+            event.setTitle(request.getTitle());
+
+        if (request.getShortSummary() != null)
+            event.setShortSummary(request.getShortSummary());
+
+        if (request.getDescription() != null)
+            event.setDescription(request.getDescription());
+
+        if (request.getCategory() != null)
+            event.setCategory(request.getCategory());
+
+        if (request.getDate() != null)
+            event.setDate(request.getDate());
+
+        if (request.getTime() != null)
+            event.setTime(request.getTime());
+
+        if (request.getTotalCapacity() != null)
+            event.setTotalCapacity(request.getTotalCapacity());
+
+        LocationModel location = event.getLocation();
+        if (request.getVenue() != null)
+            location.setVenue(request.getVenue());
+        if (request.getAddress() != null)
+            location.setAddress(request.getAddress());
+        if (request.getCity() != null)
+            location.setCity(request.getCity());
+        if (request.getCountry() != null)
+            location.setCountry(request.getCountry());
+
+        eventRepository.save(event);
+
+        return mapToEventResponse(event);
+    }
+
+    private EventResponse mapToEventResponse(EventModel event) {
+        return new EventResponse(
+                event.getEventId(),
+                event.getTitle(),
+                event.getCategory(),
+                event.getTotalCapacity(),
+                new LocationResponse(
+                        event.getLocation().getVenue(),
+                        event.getLocation().getCity()
+                ),
+                event.getTickets().stream()
+                        .map(t -> new TicketResponse(
+                                t.getTicketName(),
+                                t.getPrice(),
+                                t.getQuantity()
+                        ))
+                        .toList()
         );
     }
 }

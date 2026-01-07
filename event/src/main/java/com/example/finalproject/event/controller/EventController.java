@@ -1,6 +1,8 @@
     package com.example.finalproject.event.controller;
 
     import com.example.finalproject.event.dto.CreateEventRequest;
+    import com.example.finalproject.event.dto.event.PatchEventRequest;
+    import com.example.finalproject.event.dto.event.UpdateEventRequest;
     import com.example.finalproject.event.exception.event.CategoryEventNotFoundException;
     import com.example.finalproject.event.exception.event.EventNotFoundException;
     import com.example.finalproject.event.model.EventCategories;
@@ -219,4 +221,34 @@
         }
 
 
+        @PutMapping("/{id}")
+        public ResponseEntity<BaseResponse<EventResponse>> updateEvent(
+                @PathVariable Long id,
+                @Valid @RequestBody UpdateEventRequest request
+        ) {
+            return ResponseEntity.ok(
+                    new BaseResponse<>(
+                            true,
+                            "Event updated successfully",
+                            "00",
+                            eventService.updateEvent(id, request)
+                    )
+            );
+        }
+
+        @PatchMapping("/{id}")
+        public ResponseEntity<BaseResponse<EventResponse>> patchEvent(
+                @PathVariable Long id,
+                @RequestBody PatchEventRequest request
+                ){
+            return ResponseEntity.ok(
+                    new BaseResponse<>(
+                            true,
+                            "Event patched successfully",
+                            "00",
+                            eventService.patchEvent(id, request)
+                    )
+            );
+        }
+        
     }

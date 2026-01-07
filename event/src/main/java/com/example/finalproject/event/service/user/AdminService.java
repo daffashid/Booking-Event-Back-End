@@ -1,5 +1,7 @@
-package com.example.finalproject.event.service;
+package com.example.finalproject.event.service.user;
 
+import com.example.finalproject.event.config.JwtUtil;
+import com.example.finalproject.event.dto.AdminLoginRequest;
 import com.example.finalproject.event.dto.RegisterRequest;
 import com.example.finalproject.event.exception.user.*;
 import com.example.finalproject.event.model.UserModel;
@@ -13,10 +15,12 @@ import org.springframework.stereotype.Service;
 public class AdminService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
-    public AdminService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AdminService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
 
     public String register(RegisterRequest request)
@@ -68,7 +72,7 @@ public class AdminService {
 
     public PatchAdminResponse.updateRole promoteToAdmin(Long userId){
         UserModel user = userRepository.findById(userId)
-                .orElseThrow(UserNotFound::new);
+                .orElseThrow(UserNotFoundException::new);
 
         user.setRole(UserRole.ROLE_ADMIN);
 
@@ -79,5 +83,20 @@ public class AdminService {
                 user.getUserName(),
                 user.getRole().name()
         );
+    }
+
+    public String login(AdminLoginRequest request) {
+        UserModel admin = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+
+        if (!passwordEncoder.matches(request.getPassword(), admin.getPassword())) {
+            throw new RuntimeException("Invalid credentials");
+        }
+
+        if (admin.getRole() != UserRole.ROLE_ADMIN) {
+            throw new RuntimeException("Access denied");
+        }
+
+        return jwtUtil.generateToken(admin.getEmail(), admin.getRole().name());
     }
 }

@@ -1,10 +1,12 @@
 package com.example.finalproject.event.controller;
 
+import com.example.finalproject.event.dto.AdminLoginRequest;
 import com.example.finalproject.event.dto.RegisterRequest;
 import com.example.finalproject.event.exception.user.*;
+import com.example.finalproject.event.response.BaseResponse;
 import com.example.finalproject.event.response.admin.PatchAdminResponse;
 import com.example.finalproject.event.response.admin.RegisterResponse;
-import com.example.finalproject.event.service.AdminService;
+import com.example.finalproject.event.service.user.AdminService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -72,7 +74,7 @@ public class AuthController {
 
             return ResponseEntity.ok(response);
 
-        } catch (UserNotFound e) {
+        } catch (UserNotFoundException e) {
             response.setSuccess(false);
             response.setMessage("User not found");
             response.setErrorCode("01");
@@ -86,5 +88,19 @@ public class AuthController {
 
             return ResponseEntity.internalServerError().body(response);
         }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@Valid @RequestBody AdminLoginRequest request) {
+        String token = adminService.login(request);
+
+        return ResponseEntity.ok(
+                new BaseResponse<>(
+                        true,
+                        "Login successful",
+                        "00",
+                        token
+                )
+        );
     }
 }

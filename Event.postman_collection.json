@@ -14,6 +14,15 @@
 					"request": {
 						"method": "POST",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"firstName\": \"super\",\r\n  \"lastName\": \"admin\",\r\n  \"userName\": \"superadmin\",\r\n  \"email\": \"superadmin@gmail.com\",\r\n  \"phoneNumber\": \"081223456789\",\r\n  \"password\": \"Admin123\",\r\n  \"confirmPassword\": \"Admin123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
 							"raw": "http://localhost:8899/api/v1/auth/register",
 							"protocol": "http",
@@ -26,6 +35,40 @@
 								"v1",
 								"auth",
 								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login Admin",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"superadmin@gmail.com\",\r\n    \"password\":\"Admin123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8899/api/v1/auth/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8899",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"login"
 							]
 						}
 					},
@@ -63,19 +106,14 @@
 			"name": "CRUD Event",
 			"item": [
 				{
-					"name": "Create Event (ADMIN)",
+					"name": "Create Event (Admin)",
 					"request": {
 						"auth": {
-							"type": "basic",
-							"basic": [
+							"type": "bearer",
+							"bearer": [
 								{
-									"key": "password",
-									"value": "Admin123",
-									"type": "string"
-								},
-								{
-									"key": "username",
-									"value": "superadmin",
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdXBlcmFkbWluQGdtYWlsLmNvbSIsInJvbGUiOiJST0xFX0FETUlOIiwiaWF0IjoxNzY3NzcwMzE1LCJleHAiOjE3Njc3NzM5MTV9.v3GrRk_t3b95FKOz5C6St2dPYDQOiWKmornzzqMNa6Q",
 									"type": "string"
 								}
 							]
@@ -84,7 +122,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"title\": \"Rock Concert\",\r\n  \"shortSummary\": \"Live rock music\",\r\n  \"description\": \"A big rock concert\",\r\n  \"category\": \"MUSIC\",\r\n  \"date\": \"2026-01-20\",\r\n  \"time\": \"19:00\",\r\n  \"totalCapacity\": 500,\r\n  \"address\": \"Main Street\",\r\n  \"city\": \"Jakarta\",\r\n  \"venue\": \"Stadium\",\r\n  \"country\": \"Indonesia\"\r\n}",
+							"raw": "{\r\n  \"title\": \"Jakarta Food & Culture Festival\",\r\n  \"shortSummary\": \"Culinary and cultural celebration\",\r\n  \"description\": \"A festival celebrating Indonesian food, culture, and live performances.\",\r\n  \"category\": \"FESTIVALS\",\r\n  \"date\": \"2026-07-25\",\r\n  \"time\": \"10:00\",\r\n  \"totalCapacity\": 10000,\r\n\r\n  \"venue\": \"Monas Open Area\",\r\n  \"address\": \"Jl. Medan Merdeka Selatan\",\r\n  \"city\": \"Jakarta\",\r\n  \"country\": \"Indonesia\",\r\n\r\n  \"tickets\": [\r\n    {\r\n      \"ticketName\": \"General Entry\",\r\n      \"price\": 50000\r\n    },\r\n    {\r\n      \"ticketName\": \"VIP Pass\",\r\n      \"price\": 150000\r\n    }\r\n  ]\r\n}\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -109,12 +147,22 @@
 					"response": []
 				},
 				{
-					"name": "Delete Events",
+					"name": "Delete Events (Admin)",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdXBlcmFkbWluQGdtYWlsLmNvbSIsInJvbGUiOiJST0xFX0FETUlOIiwiaWF0IjoxNzY3NzcwMzE1LCJleHAiOjE3Njc3NzM5MTV9.v3GrRk_t3b95FKOz5C6St2dPYDQOiWKmornzzqMNa6Q",
+									"type": "string"
+								}
+							]
+						},
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8899/api/v1/events/1",
+							"raw": "http://localhost:8899/api/v1/events/7",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -124,7 +172,94 @@
 								"api",
 								"v1",
 								"events",
-								"1"
+								"7"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Events (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdXBlcmFkbWluQGdtYWlsLmNvbSIsInJvbGUiOiJST0xFX0FETUlOIiwiaWF0IjoxNzY3NzcwMzE1LCJleHAiOjE3Njc3NzM5MTV9.v3GrRk_t3b95FKOz5C6St2dPYDQOiWKmornzzqMNa6Q",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"Updated Concert\",\r\n  \"shortSummary\": \"Updated summary\",\r\n  \"description\": \"Updated description\",\r\n  \"category\": \"MUSIC\",\r\n  \"date\": \"2026-06-01\",\r\n  \"time\": \"20:00\",\r\n  \"totalCapacity\": 800,\r\n  \"venue\": \"GBK\",\r\n  \"address\": \"Jl Sudirman\",\r\n  \"city\": \"Jakarta\",\r\n  \"country\": \"Indonesia\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8899/api/v1/events/6",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8899",
+							"path": [
+								"api",
+								"v1",
+								"events",
+								"6"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Patch Events (Admin)",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "Admin123",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "superadmin",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"Only change title\",\r\n  \"city\": \"Bandung\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8899/api/v1/events/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8899",
+							"path": [
+								"api",
+								"v1",
+								"events",
+								"2"
 							]
 						}
 					},
@@ -266,6 +401,42 @@
 								"events",
 								"2",
 								"image"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Update User (PUT) Still Error",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"firstName\": \"Malin\",\r\n  \"lastName\": \"Kundang\",\r\n  \"userName\": \"Maling Kundang\",\r\n  \"email\": \"Maling@mail.com\",\r\n  \"phoneNumber\": \"0821123456789\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8899/api/v1/users/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8899",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"2"
 							]
 						}
 					},
