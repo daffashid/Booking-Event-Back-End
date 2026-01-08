@@ -10,7 +10,7 @@
 			"name": "Auth",
 			"item": [
 				{
-					"name": "Register User",
+					"name": "Register Admin",
 					"request": {
 						"method": "POST",
 						"header": [],
@@ -41,10 +41,48 @@
 					"response": []
 				},
 				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"firstName\": \"Budi\",\r\n  \"lastName\": \"Santoso\",\r\n  \"userName\": \"budisantoso\",\r\n  \"email\": \"budisantoso@example.com\",\r\n  \"phoneNumber\": \"085712345678\",\r\n  \"password\": \"Password123!\",\r\n  \"confirmPassword\": \"Password123!\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8899/api/v1/auth/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8899",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Login Admin",
 					"request": {
 						"auth": {
-							"type": "noauth"
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdXBlcmFkbWluQGdtYWlsLmNvbSIsInJvbGUiOiJST0xFX0FETUlOIiwiaWF0IjoxNzY3Nzk1MTA4LCJleHAiOjE3Njc3OTg3MDh9.HGh9iCQqYE60h0jruTRBqrpw3E5xq6ySv2fu5J328Vg",
+									"type": "string"
+								}
+							]
 						},
 						"method": "POST",
 						"header": [],
@@ -75,6 +113,81 @@
 					"response": []
 				},
 				{
+					"name": "Login User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdXBlcmFkbWluQGdtYWlsLmNvbSIsInJvbGUiOiJST0xFX0FETUlOIiwiaWF0IjoxNzY3Nzk1MTA4LCJleHAiOjE3Njc3OTg3MDh9.HGh9iCQqYE60h0jruTRBqrpw3E5xq6ySv2fu5J328Vg",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"budisantoso@example.com\",\r\n    \"password\":\"Password123!\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8899/api/v1/auth/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8899",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"superadmin@gmail.com\",\r\n    \"password\":\"Admin123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8899/api/v1/auth/logout",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8899",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Update to Admin",
 					"request": {
 						"auth": {
@@ -99,6 +212,38 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Debug",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8899/api/v1/auth/debug",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8899",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"debug"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -113,7 +258,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdXBlcmFkbWluQGdtYWlsLmNvbSIsInJvbGUiOiJST0xFX0FETUlOIiwiaWF0IjoxNzY3NzcwMzE1LCJleHAiOjE3Njc3NzM5MTV9.v3GrRk_t3b95FKOz5C6St2dPYDQOiWKmornzzqMNa6Q",
+									"value": "",
 									"type": "string"
 								}
 							]
@@ -122,7 +267,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"title\": \"Jakarta Food & Culture Festival\",\r\n  \"shortSummary\": \"Culinary and cultural celebration\",\r\n  \"description\": \"A festival celebrating Indonesian food, culture, and live performances.\",\r\n  \"category\": \"FESTIVALS\",\r\n  \"date\": \"2026-07-25\",\r\n  \"time\": \"10:00\",\r\n  \"totalCapacity\": 10000,\r\n\r\n  \"venue\": \"Monas Open Area\",\r\n  \"address\": \"Jl. Medan Merdeka Selatan\",\r\n  \"city\": \"Jakarta\",\r\n  \"country\": \"Indonesia\",\r\n\r\n  \"tickets\": [\r\n    {\r\n      \"ticketName\": \"General Entry\",\r\n      \"price\": 50000\r\n    },\r\n    {\r\n      \"ticketName\": \"VIP Pass\",\r\n      \"price\": 150000\r\n    }\r\n  ]\r\n}\r\n",
+							"raw": "{\r\n  \"title\": \"Summer Music Festival 2026\",\r\n  \"shortSummary\": \"Biggest music festival of the year\",\r\n  \"description\": \"An outdoor music festival featuring top local and international artists.\",\r\n  \"category\": \"MUSIC\",\r\n  \"imageUrl\": \"https://www.datocms-assets.com/66357/1703582519-mdlbeast2022_1203_141406-4453_pd-1.webp?auto=format&fit=max&w=3840&q=75\",\r\n\r\n  \"date\": \"2026-06-20\",\r\n  \"time\": \"18:30\",\r\n  \"totalCapacity\": 10000,\r\n\r\n  \"venue\": \"Ancol Beach Park\",\r\n  \"address\": \"Jl. Lodan Timur No.7\",\r\n  \"city\": \"Jakarta\",\r\n  \"country\": \"Indonesia\",\r\n\r\n  \"tickets\": [\r\n    {\r\n      \"ticketName\": \"General Admission\",\r\n      \"price\": 200000,\r\n      \"quantity\": 7000\r\n    },\r\n    {\r\n      \"ticketName\": \"VIP\",\r\n      \"price\": 500000,\r\n      \"quantity\": 2500\r\n    },\r\n    {\r\n      \"ticketName\": \"Backstage Pass\",\r\n      \"price\": 1000000,\r\n      \"quantity\": 500\r\n    }\r\n  ]\r\n}\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -154,15 +299,19 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdXBlcmFkbWluQGdtYWlsLmNvbSIsInJvbGUiOiJST0xFX0FETUlOIiwiaWF0IjoxNzY3NzcwMzE1LCJleHAiOjE3Njc3NzM5MTV9.v3GrRk_t3b95FKOz5C6St2dPYDQOiWKmornzzqMNa6Q",
+									"value": "",
 									"type": "string"
 								}
 							]
 						},
 						"method": "DELETE",
 						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
 						"url": {
-							"raw": "http://localhost:8899/api/v1/events/7",
+							"raw": "http://localhost:8899/api/v1/events/8",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -172,7 +321,7 @@
 								"api",
 								"v1",
 								"events",
-								"7"
+								"8"
 							]
 						}
 					},
@@ -186,7 +335,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdXBlcmFkbWluQGdtYWlsLmNvbSIsInJvbGUiOiJST0xFX0FETUlOIiwiaWF0IjoxNzY3NzcwMzE1LCJleHAiOjE3Njc3NzM5MTV9.v3GrRk_t3b95FKOz5C6St2dPYDQOiWKmornzzqMNa6Q",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdXBlcmFkbWluQGdtYWlsLmNvbSIsInJvbGUiOiJST0xFX0FETUlOIiwiaWF0IjoxNzY3NzgwMjIyLCJleHAiOjE3Njc3ODM4MjJ9.c9X4xs64NvZ1nZYy3clsdhxCetGZTPFLwirHZ19oU8w",
 									"type": "string"
 								}
 							]
@@ -203,7 +352,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8899/api/v1/events/6",
+							"raw": "http://localhost:8899/api/v1/events/9",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -213,7 +362,7 @@
 								"api",
 								"v1",
 								"events",
-								"6"
+								"9"
 							]
 						}
 					},
@@ -223,16 +372,11 @@
 					"name": "Patch Events (Admin)",
 					"request": {
 						"auth": {
-							"type": "basic",
-							"basic": [
+							"type": "bearer",
+							"bearer": [
 								{
-									"key": "password",
-									"value": "Admin123",
-									"type": "string"
-								},
-								{
-									"key": "username",
-									"value": "superadmin",
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdXBlcmFkbWluQGdtYWlsLmNvbSIsInJvbGUiOiJST0xFX0FETUlOIiwiaWF0IjoxNzY3NzgwMjIyLCJleHAiOjE3Njc3ODM4MjJ9.c9X4xs64NvZ1nZYy3clsdhxCetGZTPFLwirHZ19oU8w",
 									"type": "string"
 								}
 							]
@@ -249,7 +393,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8899/api/v1/events/2",
+							"raw": "http://localhost:8899/api/v1/events/9",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -259,55 +403,7 @@
 								"api",
 								"v1",
 								"events",
-								"2"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Add Image Event (Admin)",
-					"request": {
-						"auth": {
-							"type": "basic",
-							"basic": [
-								{
-									"key": "password",
-									"value": "Admin123",
-									"type": "string"
-								},
-								{
-									"key": "username",
-									"value": "superadmin",
-									"type": "string"
-								}
-							]
-						},
-						"method": "PATCH",
-						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "image",
-									"type": "file",
-									"src": "/D:/E-Learning/Udemy/The Complete Full-Stack Web Development Bootcamp/tesproject/bus/images/logo.JPG"
-								}
-							]
-						},
-						"url": {
-							"raw": "http://localhost:8899/api/v1/events/2/image",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8899",
-							"path": [
-								"api",
-								"v1",
-								"events",
-								"2",
-								"image"
+								"9"
 							]
 						}
 					},
@@ -345,7 +441,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8899/api/v1/events/1",
+							"raw": "http://localhost:8899/api/v1/events/2",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -355,7 +451,7 @@
 								"api",
 								"v1",
 								"events",
-								"1"
+								"2"
 							]
 						}
 					},
@@ -367,7 +463,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8899/api/v1/events/1",
+							"raw": "http://localhost:8899/api/v1/events/category/COMEDY",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -377,30 +473,8 @@
 								"api",
 								"v1",
 								"events",
-								"1"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Image",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:8899/api/v1/events/2/image",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8899",
-							"path": [
-								"api",
-								"v1",
-								"events",
-								"2",
-								"image"
+								"category",
+								"COMEDY"
 							]
 						}
 					},

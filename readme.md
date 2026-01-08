@@ -14,7 +14,6 @@ You can test all API endpoints using Postman.
 1. Register Account
 2. Change the role admin 
 3. Login using /api/v1/auth/login
-4. Receive JWT token
-5. Copy token to clipboard
-6. Set token as Bearer Token in Postman
-7. Execute ADMIN-only actions
+4. Receive JWT token in cookies so there is no need to copy paste the token manually
+5. Set token as Bearer Token in Postman
+6. Execute ADMIN-only actions
