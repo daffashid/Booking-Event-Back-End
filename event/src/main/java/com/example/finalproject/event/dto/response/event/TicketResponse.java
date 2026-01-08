@@ -1,4 +1,4 @@
-package com.example.finalproject.event.response.event;
+package com.example.finalproject.event.dto.response.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

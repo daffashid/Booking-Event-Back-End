@@ -1,7 +1,7 @@
 package com.example.finalproject.event.service.user;
 
-import com.example.finalproject.event.dto.PatchUserRequest;
-import com.example.finalproject.event.dto.UpdateUserRequest;
+import com.example.finalproject.event.dto.request.PatchUserRequest;
+import com.example.finalproject.event.dto.request.UpdateUserRequest;
 import com.example.finalproject.event.exception.user.UserNotFoundException;
 import com.example.finalproject.event.model.UserModel;
 import com.example.finalproject.event.repository.UserRepository;

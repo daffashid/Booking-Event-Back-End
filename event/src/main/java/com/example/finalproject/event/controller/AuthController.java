@@ -1,24 +1,29 @@
 package com.example.finalproject.event.controller;
 
-import com.example.finalproject.event.dto.AdminLoginRequest;
-import com.example.finalproject.event.dto.RegisterRequest;
+import com.example.finalproject.event.dto.request.auth.LoginRequest;
+import com.example.finalproject.event.dto.request.auth.RegisterRequest;
 import com.example.finalproject.event.exception.user.*;
-import com.example.finalproject.event.response.BaseResponse;
-import com.example.finalproject.event.response.admin.PatchAdminResponse;
-import com.example.finalproject.event.response.admin.RegisterResponse;
-import com.example.finalproject.event.service.user.AdminService;
+import com.example.finalproject.event.dto.response.BaseResponse;
+import com.example.finalproject.event.dto.response.admin.PatchAdminResponse;
+import com.example.finalproject.event.dto.response.admin.RegisterResponse;
+import com.example.finalproject.event.service.user.AuthService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/auth")
 public class AuthController {
-    private final AdminService adminService;
+    private final AuthService authService;
 
-    public AuthController(AdminService adminService) {
-        this.adminService = adminService;
+    public AuthController(AuthService authService) {
+        this.authService = authService;
     }
 
     @PostMapping("/register")
@@ -28,7 +33,7 @@ public class AuthController {
         RegisterResponse response = new RegisterResponse();
 
         try {
-            response.setData(adminService.register(request));
+            response.setData(authService.register(request));
             response.setMessage("success");
             response.setSuccess(true);
             response.setErrorCode("00");
@@ -67,7 +72,7 @@ public class AuthController {
         PatchAdminResponse response = new PatchAdminResponse();
 
         try {
-            response.setData(adminService.promoteToAdmin(id));
+            response.setData(authService.promoteToAdmin(id));
             response.setSuccess(true);
             response.setMessage("User promoted to admin");
             response.setErrorCode("00");
@@ -91,16 +96,39 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody AdminLoginRequest request) {
-        String token = adminService.login(request);
-
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request, HttpServletResponse response) {
+        String token = authService.login(request);
+        authService.setTokenCookie(response, token);
         return ResponseEntity.ok(
                 new BaseResponse<>(
                         true,
                         "Login successful",
                         "00",
-                        token
+                        null
                 )
+        );
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletResponse response) {
+        authService.logout(response);
+
+        return ResponseEntity.ok("Logout berhasil");
+    }
+
+    @GetMapping("/debug")
+    public Object debugAuth(Authentication auth) {
+        if (auth == null) {
+            return "Authentication is NULL";
+        }
+
+        return Map.of(
+                "principal", auth.getPrincipal(),
+                "authorities", auth.getAuthorities()
+                        .stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .toList(),
+                "authenticated", auth.isAuthenticated()
         );
     }
 }

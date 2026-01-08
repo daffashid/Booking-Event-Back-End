@@ -1,8 +1,9 @@
 package com.example.finalproject.event.service.event;
 
-import com.example.finalproject.event.dto.CreateEventRequest;
-import com.example.finalproject.event.dto.event.PatchEventRequest;
-import com.example.finalproject.event.dto.event.UpdateEventRequest;
+import com.example.finalproject.event.dto.request.event.CreateEventRequest;
+import com.example.finalproject.event.dto.request.event.PatchEventRequest;
+import com.example.finalproject.event.dto.request.event.UpdateEventRequest;
+import com.example.finalproject.event.dto.response.event.*;
 import com.example.finalproject.event.exception.event.CategoryEventNotFoundException;
 import com.example.finalproject.event.exception.event.EventNotFoundException;
 import com.example.finalproject.event.model.EventCategories;
@@ -10,7 +11,6 @@ import com.example.finalproject.event.model.EventModel;
 import com.example.finalproject.event.model.LocationModel;
 import com.example.finalproject.event.model.TicketModel;
 import com.example.finalproject.event.repository.EventRepository;
-import com.example.finalproject.event.response.event.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -43,6 +43,7 @@ public class EventService {
                 .shortSummary(request.getShortSummary())
                 .description(request.getDescription())
                 .category(request.getCategory())
+                .imageUrl(request.getImageUrl())
                 .date(request.getDate())
                 .time(request.getTime())
                 .totalCapacity(request.getTotalCapacity())
@@ -51,14 +52,20 @@ public class EventService {
 
         if (request.getTickets() != null && !request.getTickets().isEmpty()) {
 
-            int ticketCount = request.getTickets().size();
-            int quantityPerTicket = request.getTotalCapacity() / ticketCount;
+            int totalTicketQuantity = request.getTickets().stream()
+                    .mapToInt(t -> t.getQuantity())
+                    .sum();
 
+            if (totalTicketQuantity != request.getTotalCapacity()) {
+                throw new IllegalArgumentException(
+                        "Total ticket quantity must equal totalCapacity"
+                );
+            }
             List<TicketModel> tickets = request.getTickets().stream()
                     .map(t -> TicketModel.builder()
                             .ticketName(t.getTicketName())
                             .price(BigDecimal.valueOf(t.getPrice()))
-                            .quantity(quantityPerTicket)
+                            .quantity(t.getQuantity())
                             .event(event)
                             .build()
                     )
@@ -220,6 +227,11 @@ public class EventService {
         return new EventResponse(
                 event.getEventId(),
                 event.getTitle(),
+                event.getShortSummary(),
+                event.getDescription(),
+                event.getImageUrl(),
+                event.getDate(),
+                event.getTime(),
                 event.getCategory(),
                 event.getTotalCapacity(),
                 new LocationResponse(

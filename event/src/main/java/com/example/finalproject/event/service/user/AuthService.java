@@ -1,23 +1,25 @@
 package com.example.finalproject.event.service.user;
 
 import com.example.finalproject.event.config.JwtUtil;
-import com.example.finalproject.event.dto.AdminLoginRequest;
-import com.example.finalproject.event.dto.RegisterRequest;
+import com.example.finalproject.event.dto.request.auth.LoginRequest;
+import com.example.finalproject.event.dto.request.auth.RegisterRequest;
 import com.example.finalproject.event.exception.user.*;
 import com.example.finalproject.event.model.UserModel;
 import com.example.finalproject.event.model.UserRole;
 import com.example.finalproject.event.repository.UserRepository;
-import com.example.finalproject.event.response.admin.PatchAdminResponse;
+import com.example.finalproject.event.dto.response.admin.PatchAdminResponse;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AdminService {
+public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    public AdminService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
@@ -85,18 +87,36 @@ public class AdminService {
         );
     }
 
-    public String login(AdminLoginRequest request) {
-        UserModel admin = userRepository.findByEmail(request.getEmail())
+    public String login(LoginRequest request) {
+        UserModel user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Invalid credentials"));
 
-        if (!passwordEncoder.matches(request.getPassword(), admin.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid credentials");
         }
 
-        if (admin.getRole() != UserRole.ROLE_ADMIN) {
+        if (user.getRole() != UserRole.ROLE_ADMIN) {
             throw new RuntimeException("Access denied");
         }
 
-        return jwtUtil.generateToken(admin.getEmail(), admin.getRole().name());
+        return jwtUtil.generateToken(user.getEmail(), user.getRole().name());
+    }
+
+    public void setTokenCookie(HttpServletResponse response, String token) {
+        Cookie cookie = new Cookie("jwt", token);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(false);
+        cookie.setPath("/");
+        cookie.setMaxAge(24 * 60 * 60);
+        response.addCookie(cookie);
+    }
+
+    public void logout(HttpServletResponse response) {
+        Cookie cookie = new Cookie("jwt", null);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(false);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
     }
 }

@@ -1,6 +1,6 @@
-package com.example.finalproject.event.response.admin;
+package com.example.finalproject.event.dto.response.admin;
 
-import com.example.finalproject.event.response.BaseResponse;
+import com.example.finalproject.event.dto.response.BaseResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -1,4 +1,4 @@
-package com.example.finalproject.event.dto;
+package com.example.finalproject.event.dto.request.event;
 
 import com.example.finalproject.event.model.EventCategories;
 import jakarta.validation.constraints.Future;
@@ -25,6 +25,8 @@ public class CreateEventRequest {
 
     @NotNull(message = "This field is required")
     private EventCategories category;
+
+    private String imageUrl;
 
     // ===== DATE & TIME =====
     @Future(message = "Event date must be in the future")
@@ -59,5 +61,8 @@ public class CreateEventRequest {
 
         @Min(value = 0, message = "Price must be positive")
         private Integer price;
+
+        @Min(value = 0, message = "Quantity must be positive")
+        private Integer quantity;
     }
 }

@@ -1,14 +1,14 @@
     package com.example.finalproject.event.controller;
 
-    import com.example.finalproject.event.dto.CreateEventRequest;
-    import com.example.finalproject.event.dto.event.PatchEventRequest;
-    import com.example.finalproject.event.dto.event.UpdateEventRequest;
+    import com.example.finalproject.event.dto.request.event.CreateEventRequest;
+    import com.example.finalproject.event.dto.request.event.PatchEventRequest;
+    import com.example.finalproject.event.dto.request.event.UpdateEventRequest;
+    import com.example.finalproject.event.dto.response.event.*;
     import com.example.finalproject.event.exception.event.CategoryEventNotFoundException;
     import com.example.finalproject.event.exception.event.EventNotFoundException;
     import com.example.finalproject.event.model.EventCategories;
     import com.example.finalproject.event.model.EventModel;
-    import com.example.finalproject.event.response.BaseResponse;
-    import com.example.finalproject.event.response.event.*;
+    import com.example.finalproject.event.dto.response.BaseResponse;
     import com.example.finalproject.event.service.event.EventService;
     import jakarta.validation.Valid;
     import org.springframework.http.HttpStatus;
@@ -39,6 +39,11 @@
             EventResponse eventResponse = new EventResponse(
                     event.getEventId(),
                     event.getTitle(),
+                    event.getShortSummary(),
+                    event.getDescription(),
+                    event.getImageUrl(),
+                    event.getDate(),
+                    event.getTime(),
                     event.getCategory(),
                     event.getTotalCapacity(),
                     new LocationResponse(

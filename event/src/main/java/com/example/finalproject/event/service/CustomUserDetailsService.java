@@ -2,10 +2,14 @@ package com.example.finalproject.event.service;
 
 import com.example.finalproject.event.model.UserModel;
 import com.example.finalproject.event.repository.UserRepository;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -16,20 +20,19 @@ public class CustomUserDetailsService implements UserDetailsService {
         this.userRepository = userRepository;
     }
 
-    // ✅ EXACT method signature required by Spring Security
     @Override
-    public UserDetails loadUserByUsername(String username)
+    public UserDetails loadUserByUsername(String email)
             throws UsernameNotFoundException {
 
-        UserModel user = userRepository.findByUserName(username)
-                .orElseThrow(() ->
-                        new UsernameNotFoundException("User not found")
-                );
+        UserModel user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        return org.springframework.security.core.userdetails.User
-                .withUsername(user.getUserName())
-                .password(user.getPassword()) // BCrypt
-                .roles(user.getRole().name().replace("ROLE_", ""))
-                .build();
+        return new User(
+                user.getEmail(),
+                user.getPassword(),
+                List.of(
+                        new SimpleGrantedAuthority(user.getRole().name())
+                )
+        );
     }
 }
