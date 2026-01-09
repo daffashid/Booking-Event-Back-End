@@ -96,17 +96,38 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request, HttpServletResponse response) {
-        String token = authService.login(request);
-        authService.setTokenCookie(response, token);
-        return ResponseEntity.ok(
-                new BaseResponse<>(
-                        true,
-                        "Login successful",
-                        "00",
-                        null
-                )
-        );
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request, HttpServletResponse httpResponse) {
+        BaseResponse<Void> response = new BaseResponse<>();
+
+        try {
+            String token = authService.login(request);
+            authService.setTokenCookie(httpResponse, token);
+
+            response.setSuccess(true);
+            response.setMessage("Login successful");
+            response.setErrorCode("00");
+
+            return ResponseEntity.ok(response);
+
+        } catch (EmailNotFoundException e) {
+            response.setMessage("Email not registered");
+            response.setErrorCode("01");
+
+        } catch (InvalidCredentialException e) {
+            response.setMessage("Incorrect password");
+            response.setErrorCode("02");
+
+        } catch (UnauthorizedAccessException e) {
+            response.setMessage("You are not authorized to access this page");
+            response.setErrorCode("03");
+
+        } catch (Exception e) {
+            response.setMessage("Something went wrong");
+            response.setErrorCode("99");
+        }
+
+        response.setSuccess(false);
+        return ResponseEntity.badRequest().body(response);
     }
 
     @PostMapping("/logout")

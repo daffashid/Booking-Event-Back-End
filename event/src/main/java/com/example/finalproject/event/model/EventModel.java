@@ -41,10 +41,10 @@ public class EventModel {
 
     private LocalTime time;
 
-    @Min(value = 1, message = "Quota must be greater than zero")
+    @Min(value = 0)
     private Integer totalCapacity;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location_id", nullable = false)
     private LocationModel location;
 

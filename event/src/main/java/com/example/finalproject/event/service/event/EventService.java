@@ -6,11 +6,14 @@ import com.example.finalproject.event.dto.request.event.UpdateEventRequest;
 import com.example.finalproject.event.dto.response.event.*;
 import com.example.finalproject.event.exception.event.CategoryEventNotFoundException;
 import com.example.finalproject.event.exception.event.EventNotFoundException;
+import com.example.finalproject.event.exception.event.NoActiveEventException;
 import com.example.finalproject.event.model.EventCategories;
 import com.example.finalproject.event.model.EventModel;
 import com.example.finalproject.event.model.LocationModel;
 import com.example.finalproject.event.model.TicketModel;
 import com.example.finalproject.event.repository.EventRepository;
+import com.example.finalproject.event.repository.LocationRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,13 +25,18 @@ public class EventService {
 
     private final ImageService imageService;
     private final EventRepository eventRepository;
+    private final LocationRepository locationRepository;
+    private final EventMapper eventMapper;
 
     public EventService(EventRepository eventRepository,
-                        ImageService imageService) {
+                        ImageService imageService,
+                        LocationRepository locationRepository,
+                        EventMapper eventMapper) {
         this.eventRepository = eventRepository;
         this.imageService = imageService;
+        this.locationRepository = locationRepository;
+        this.eventMapper = eventMapper;
     }
-
     public EventModel createEvent(CreateEventRequest request) {
 
         LocationModel location = LocationModel.builder()
@@ -37,6 +45,8 @@ public class EventService {
                 .city(request.getCity())
                 .country(request.getCountry())
                 .build();
+
+        locationRepository.save(location);
 
         EventModel event = EventModel.builder()
                 .title(request.getTitle())
@@ -61,14 +71,14 @@ public class EventService {
                         "Total ticket quantity must equal totalCapacity"
                 );
             }
+
             List<TicketModel> tickets = request.getTickets().stream()
                     .map(t -> TicketModel.builder()
                             .ticketName(t.getTicketName())
                             .price(BigDecimal.valueOf(t.getPrice()))
                             .quantity(t.getQuantity())
                             .event(event)
-                            .build()
-                    )
+                            .build())
                     .toList();
 
             event.setTickets(tickets);
@@ -78,49 +88,54 @@ public class EventService {
     }
 
     public List<EventListItemResponse> getAllEvents() {
-        return eventRepository.findAll().stream()
-                .map(event -> new EventListItemResponse(
-                        event.getEventId(),
-                        event.getTitle(),
-                        event.getCategory(),
-                        event.getDate(),
-                        event.getLocation().getVenue(),
-                        event.getLocation().getCity(),
-                        event.getTickets().stream()
-                                .mapToInt(t -> t.getPrice().intValue())
-                                .min()
-                                .orElse(0)
-                ))
+
+        List<EventModel> events = eventRepository.findAllActiveEvents();
+
+        if (events.isEmpty()) {
+            throw new NoActiveEventException();
+        }
+
+        return events.stream()
+                .map(eventMapper::toListItem)
                 .toList();
     }
 
     public List<EventListItemResponse> getEventsByCategory(EventCategories category) {
-        List<EventModel> events = eventRepository.findByCategory(category);
+
+        List<EventModel> events =
+                eventRepository.findActiveEventsByCategory(category);
+
         if (events.isEmpty()) {
             throw new CategoryEventNotFoundException();
         }
+
         return events.stream()
-                .map(event -> new EventListItemResponse(
-                        event.getEventId(),
-                        event.getTitle(),
-                        event.getCategory(),
-                        event.getDate(),
-                        event.getLocation().getVenue(),
-                        event.getLocation().getCity(),
-                        event.getTickets().stream()
-                                .mapToInt(t -> t.getPrice().intValue())
-                                .min()
-                                .orElse(0)
-                ))
+                .map(eventMapper::toListItem)
                 .toList();
     }
 
 
-    public EventResponse getEventDetail(Long id) {
+    public EventDetailResponse getEventDetail(Long id) {
         EventModel event = eventRepository.findById(id)
-                .orElseThrow(() -> new EventNotFoundException());
+                .orElseThrow(EventNotFoundException::new);
 
-        return mapToEventResponse(event);
+        int remainingQuota = event.getTickets().stream()
+                .mapToInt(TicketModel::getQuantity)
+                .sum();
+
+        EventDetailResponse response = eventMapper.toDetailResponse(event, remainingQuota);
+
+        // warning jika sisa ≤ 10%
+        int tenPercentThreshold =
+                (int) Math.ceil(event.getTotalCapacity() * 0.1);
+
+        if (remainingQuota > 0 && remainingQuota <= tenPercentThreshold) {
+            response.setWarningMessage(
+                    "Almost sold out! Only " + remainingQuota + " spots remaining."
+            );
+        }
+
+        return response;
     }
 
     public void deleteEvent(Long eventId) {
@@ -129,33 +144,6 @@ public class EventService {
         }
 
         eventRepository.deleteById(eventId);
-    }
-
-
-    public String updateEventImage(Long eventId, MultipartFile image) {
-        EventModel event = eventRepository.findById(eventId)
-                .orElseThrow(EventNotFoundException::new);
-
-        String imageUrl = imageService.uploadEventImage(image);
-
-        event.setImageUrl(imageUrl);
-        eventRepository.save(event);
-
-        return imageUrl;
-    }
-
-    public EventImageResponse getEventImage(Long eventId) {
-        EventModel event = eventRepository.findById(eventId)
-                .orElseThrow(EventNotFoundException::new);
-
-        if (event.getImageUrl() == null || event.getImageUrl().isBlank()) {
-            throw new EventNotFoundException();
-        }
-
-        return new EventImageResponse(
-                event.getEventId(),
-                event.getImageUrl()
-        );
     }
 
     public EventResponse updateEvent(Long eventId, UpdateEventRequest request) {
@@ -179,7 +167,7 @@ public class EventService {
 
         eventRepository.save(event);
 
-        return mapToEventResponse(event);
+        return eventMapper.toEventResponse(event);
     }
 
     public EventResponse patchEvent(Long eventId, PatchEventRequest request) {
@@ -205,9 +193,13 @@ public class EventService {
         if (request.getTime() != null)
             event.setTime(request.getTime());
 
-        if (request.getTotalCapacity() != null)
+        if (request.getTotalCapacity() != null) {
             event.setTotalCapacity(request.getTotalCapacity());
-
+            if (request.getTotalCapacity() == 0 && event.getTickets() != null) {
+                event.getTickets()
+                        .forEach(ticket -> ticket.setQuantity(0));
+            }
+        }
         LocationModel location = event.getLocation();
         if (request.getVenue() != null)
             location.setVenue(request.getVenue());
@@ -220,31 +212,6 @@ public class EventService {
 
         eventRepository.save(event);
 
-        return mapToEventResponse(event);
-    }
-
-    private EventResponse mapToEventResponse(EventModel event) {
-        return new EventResponse(
-                event.getEventId(),
-                event.getTitle(),
-                event.getShortSummary(),
-                event.getDescription(),
-                event.getImageUrl(),
-                event.getDate(),
-                event.getTime(),
-                event.getCategory(),
-                event.getTotalCapacity(),
-                new LocationResponse(
-                        event.getLocation().getVenue(),
-                        event.getLocation().getCity()
-                ),
-                event.getTickets().stream()
-                        .map(t -> new TicketResponse(
-                                t.getTicketName(),
-                                t.getPrice(),
-                                t.getQuantity()
-                        ))
-                        .toList()
-        );
+        return eventMapper.toEventResponse(event);
     }
 }

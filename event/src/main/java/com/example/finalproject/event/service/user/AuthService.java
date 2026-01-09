@@ -87,7 +87,7 @@ public class AuthService {
         );
     }
 
-    public String login(LoginRequest request) {
+    public String loginAdmin(LoginRequest request) {
         UserModel user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Invalid credentials"));
 
@@ -100,6 +100,20 @@ public class AuthService {
         }
 
         return jwtUtil.generateToken(user.getEmail(), user.getRole().name());
+    }
+
+    public String login(LoginRequest request) {
+        UserModel user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(EmailNotFoundException::new);
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new InvalidCredentialException();
+        }
+
+        return jwtUtil.generateToken(
+                user.getEmail(),
+                user.getRole().name()
+        );
     }
 
     public void setTokenCookie(HttpServletResponse response, String token) {

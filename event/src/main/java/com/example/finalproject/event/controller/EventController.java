@@ -37,7 +37,6 @@
             EventModel event = eventService.createEvent(request);
 
             EventResponse eventResponse = new EventResponse(
-                    event.getEventId(),
                     event.getTitle(),
                     event.getShortSummary(),
                     event.getDescription(),
@@ -57,6 +56,7 @@
                                     t.getQuantity()
                             ))
                             .toList()
+
             );
 
             BaseResponse<EventResponse> response =
@@ -73,72 +73,85 @@
         @GetMapping
         public ResponseEntity<BaseResponse<List<EventListItemResponse>>> getAllEvents() {
 
-            List<EventListItemResponse> events = eventService.getAllEvents();
+            BaseResponse<List<EventListItemResponse>> response =
+                    new BaseResponse<>();
 
-            return ResponseEntity.ok(
-                    new BaseResponse<>(
-                            true,
-                            "Events fetched successfully",
-                            "00",
-                            events
-                    )
-            );
+            try {
+                response.setData(eventService.getAllEvents());
+                response.setMessage("Events fetched successfully");
+                response.setSuccess(true);
+                response.setErrorCode("00");
+
+                return ResponseEntity.ok(response);
+
+            } catch (EventNotFoundException e) {
+                response.setMessage("No events available");
+                response.setErrorCode("01");
+
+            } catch (Exception e) {
+                response.setMessage("Failed to load events. Please try again");
+                response.setErrorCode("99");
+            }
+
+            response.setSuccess(false);
+            return ResponseEntity.badRequest().body(response);
         }
 
         @GetMapping("/category/{category}")
         public ResponseEntity<BaseResponse<List<EventListItemResponse>>> getByCategory(
                 @PathVariable EventCategories category
         ) {
+
+            BaseResponse<List<EventListItemResponse>> response = new BaseResponse<>();
+
             try {
-                return ResponseEntity.ok(
-                        new BaseResponse<>(
-                                true,
-                                "Events fetched successfully",
-                                "00",
-                                eventService.getEventsByCategory(category)
-                        )
-                );
+                response.setData(eventService.getEventsByCategory(category));
+                response.setMessage("Events fetched successfully");
+                response.setSuccess(true);
+                response.setErrorCode("00");
+
+                return ResponseEntity.ok(response);
 
             } catch (CategoryEventNotFoundException e) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                        new BaseResponse<>(
-                                false,
-                                "No events found for this category",
-                                "01",
-                                null
-                        )
-                );
+                response.setMessage("No events found in this category");
+                response.setErrorCode("01");
+
+            } catch (Exception e) {
+                response.setMessage("Failed to load events. Please try again");
+                response.setErrorCode("99");
             }
+
+            response.setSuccess(false);
+            return ResponseEntity.badRequest().body(response);
         }
 
         @GetMapping("/{id}")
-        public ResponseEntity<BaseResponse<EventResponse>> getEventDetail(
+        public ResponseEntity<BaseResponse<EventDetailResponse>> getEventDetail(
                 @PathVariable Long id
         ) {
-            try {
-                EventResponse event = eventService.getEventDetail(id);
+            BaseResponse<EventDetailResponse> response =
+                    new BaseResponse<>();
 
-                return ResponseEntity.ok(
-                        new BaseResponse<>(
-                                true,
-                                "Event fetched successfully",
-                                "00",
-                                event
-                        )
-                );
+            try {
+                response.setData(eventService.getEventDetail(id));
+                response.setMessage("Event fetched successfully");
+                response.setSuccess(true);
+                response.setErrorCode("00");
+
+                return ResponseEntity.ok(response);
 
             } catch (EventNotFoundException e) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                        new BaseResponse<>(
-                                false,
-                                "Event not found",
-                                "01",
-                                null
-                        )
-                );
-            }
-        }
+                response.setMessage("Event not found");
+                response.setErrorCode("01");
 
+            } catch (Exception e) {
+                response.setMessage("Failed to load event. Please try again");
+                response.setErrorCode("99");
+            }
+
+            response.setSuccess(false);
+            return ResponseEntity.badRequest().body(response);
+        }
 
         @DeleteMapping("/{id}")
         @PreAuthorize("hasRole('ADMIN')")
@@ -178,53 +191,6 @@
                 );
             }
         }
-
-        @PatchMapping("/{id}/image")
-        @PreAuthorize("hasRole('ADMIN')")
-        public ResponseEntity<BaseResponse<String>> uploadEventImage(
-                @PathVariable Long id,
-                @RequestParam MultipartFile image
-        ) {
-            String imageUrl = eventService.updateEventImage(id, image);
-
-            return ResponseEntity.ok(
-                    new BaseResponse<>(
-                            true,
-                            "Event image updated",
-                            "00",
-                            imageUrl
-                    )
-            );
-        }
-
-        @GetMapping("/{id}/image")
-        public ResponseEntity<BaseResponse<EventImageResponse>> getEventImage(
-                @PathVariable Long id
-        ) {
-            try {
-                EventImageResponse image = eventService.getEventImage(id);
-
-                return ResponseEntity.ok(
-                        new BaseResponse<>(
-                                true,
-                                "Event image fetched successfully",
-                                "00",
-                                image
-                        )
-                );
-
-            } catch (EventNotFoundException e) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                        new BaseResponse<>(
-                                false,
-                                e.getMessage(),
-                                "01",
-                                null
-                        )
-                );
-            }
-        }
-
 
         @PutMapping("/{id}")
         public ResponseEntity<BaseResponse<EventResponse>> updateEvent(
