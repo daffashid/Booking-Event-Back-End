@@ -37,4 +37,20 @@ public interface EventRepository extends JpaRepository<EventModel, Long> {
     List<EventModel> findActiveEventsByCategory(
             @Param("category") EventCategories category
     );
+
+    /* =========================
+       GET ACTIVE EVENTS BY SEARCH
+       ========================= */
+    @Query("""
+    SELECT DISTINCT e
+    FROM EventModel e
+    JOIN e.tickets t
+    WHERE
+        LOWER(e.title) LIKE LOWER(CONCAT('%', :keyword, '%'))
+        OR LOWER(e.description) LIKE LOWER(CONCAT('%', :keyword, '%'))
+        OR LOWER(e.location.city) LIKE LOWER(CONCAT('%', :keyword, '%'))
+    GROUP BY e
+    HAVING SUM(t.quantity) > 0
+""")
+    List<EventModel> searchEvents(@Param("keyword") String keyword);
 }

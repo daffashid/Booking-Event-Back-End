@@ -39,16 +39,19 @@ public class EventMapper {
        LIST ITEM RESPONSE
        ========================= */
     public EventListItemResponse toListItem(EventModel event) {
+        int minPrice = event.getTickets() == null || event.getTickets().isEmpty()
+                ? 0
+                : event.getTickets().stream()
+                .mapToInt(t -> t.getPrice().intValue())
+                .min()
+                .orElse(0);
         return new EventListItemResponse(
                 event.getTitle(),
                 event.getCategory(),
                 event.getDate(),
                 event.getLocation().getVenue(),
                 event.getLocation().getCity(),
-                event.getTickets().stream()
-                        .mapToInt(t -> t.getPrice().intValue())
-                        .min()
-                        .orElse(0)
+                minPrice
         );
     }
 
@@ -84,5 +87,33 @@ public class EventMapper {
                 )
                 .warningMessage(null)
                 .build();
+    }
+
+    public EventListAdminResponse toAdminList(EventModel event) {
+
+        int remainingQuota = event.getTickets() == null
+                ? event.getTotalCapacity()
+                : event.getTickets().stream()
+                .mapToInt(TicketModel::getQuantity)
+                .sum();
+
+        int minPrice = event.getTickets() == null || event.getTickets().isEmpty()
+                ? 0
+                : event.getTickets().stream()
+                .mapToInt(t -> t.getPrice().intValue())
+                .min()
+                .orElse(0);
+
+        return new EventListAdminResponse(
+                event.getEventId(),
+                event.getTitle(),
+                event.getCategory(),
+                event.getDate(),
+                event.getLocation().getVenue(),
+                event.getLocation().getCity(),
+                minPrice,
+                event.getTotalCapacity(),
+                remainingQuota
+        );
     }
 }

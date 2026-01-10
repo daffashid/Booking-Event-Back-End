@@ -1,4 +1,4 @@
-package com.example.finalproject.event.dto.request;
+package com.example.finalproject.event.dto.request.user;
 
 import jakarta.validation.constraints.Email;
 import lombok.Data;

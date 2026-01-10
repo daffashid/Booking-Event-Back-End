@@ -6,6 +6,7 @@
     import com.example.finalproject.event.dto.response.event.*;
     import com.example.finalproject.event.exception.event.CategoryEventNotFoundException;
     import com.example.finalproject.event.exception.event.EventNotFoundException;
+    import com.example.finalproject.event.exception.event.EventSearchNotFoundException;
     import com.example.finalproject.event.model.EventCategories;
     import com.example.finalproject.event.model.EventModel;
     import com.example.finalproject.event.dto.response.BaseResponse;
@@ -193,33 +194,103 @@
         }
 
         @PutMapping("/{id}")
+        @PreAuthorize("hasRole('ADMIN')")
         public ResponseEntity<BaseResponse<EventResponse>> updateEvent(
                 @PathVariable Long id,
                 @Valid @RequestBody UpdateEventRequest request
         ) {
-            return ResponseEntity.ok(
-                    new BaseResponse<>(
-                            true,
-                            "Event updated successfully",
-                            "00",
-                            eventService.updateEvent(id, request)
-                    )
-            );
+            BaseResponse<EventResponse> response = new BaseResponse<>();
+
+            try {
+                response.setData(eventService.updateEvent(id, request));
+                response.setMessage("Event updated successfully");
+                response.setSuccess(true);
+                response.setErrorCode("00");
+
+                return ResponseEntity.ok(response);
+
+            } catch (EventNotFoundException e) {
+                response.setMessage("Event not found");
+                response.setErrorCode("01");
+
+            } catch (IllegalArgumentException e) {
+                response.setMessage("Invalid event data");
+                response.setErrorCode("02");
+
+            } catch (Exception e) {
+                response.setMessage("Failed to update event");
+                response.setErrorCode("99");
+            }
+
+            response.setSuccess(false);
+            return ResponseEntity.badRequest().body(response);
         }
 
         @PatchMapping("/{id}")
+        @PreAuthorize("hasRole('ADMIN')")
         public ResponseEntity<BaseResponse<EventResponse>> patchEvent(
                 @PathVariable Long id,
-                @RequestBody PatchEventRequest request
+                @Valid @RequestBody PatchEventRequest request
                 ){
-            return ResponseEntity.ok(
-                    new BaseResponse<>(
-                            true,
-                            "Event patched successfully",
-                            "00",
-                            eventService.patchEvent(id, request)
-                    )
-            );
+            BaseResponse<EventResponse> response = new BaseResponse<>();
+
+            try {
+                response.setData(eventService.patchEvent(id, request));
+                response.setMessage("Event updated successfully");
+                response.setSuccess(true);
+                response.setErrorCode("00");
+
+                return ResponseEntity.ok(response);
+
+            } catch (EventNotFoundException e) {
+                response.setMessage("Event not found");
+                response.setErrorCode("01");
+
+            } catch (IllegalArgumentException e) {
+                response.setMessage("Invalid event data");
+                response.setErrorCode("02");
+
+            } catch (Exception e) {
+                response.setMessage("Failed to update event");
+                response.setErrorCode("99");
+            }
+
+            response.setSuccess(false);
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        @GetMapping("/search")
+        public ResponseEntity<BaseResponse<List<EventListItemResponse>>> searchEvents(
+                @RequestParam String keyword
+        ) {
+            BaseResponse<List<EventListItemResponse>> response = new BaseResponse<>();
+
+            try {
+                List<EventListItemResponse> result =
+                        eventService.searchEvents(keyword);
+
+                response.setData(result);
+                response.setMessage("Events fetched successfully");
+                response.setSuccess(true);
+                response.setErrorCode("00");
+
+                return ResponseEntity.ok(response);
+
+            } catch (EventSearchNotFoundException e) {
+                response.setMessage("No events match your search");
+                response.setErrorCode("01");
+
+            } catch (IllegalArgumentException e) {
+                response.setMessage("Invalid search keyword");
+                response.setErrorCode("02");
+
+            } catch (Exception e) {
+                response.setMessage("Failed to search events");
+                response.setErrorCode("99");
+            }
+
+            response.setSuccess(false);
+            return ResponseEntity.badRequest().body(response);
         }
         
     }

@@ -6,6 +6,7 @@ import com.example.finalproject.event.dto.request.event.UpdateEventRequest;
 import com.example.finalproject.event.dto.response.event.*;
 import com.example.finalproject.event.exception.event.CategoryEventNotFoundException;
 import com.example.finalproject.event.exception.event.EventNotFoundException;
+import com.example.finalproject.event.exception.event.EventSearchNotFoundException;
 import com.example.finalproject.event.exception.event.NoActiveEventException;
 import com.example.finalproject.event.model.EventCategories;
 import com.example.finalproject.event.model.EventModel;
@@ -155,6 +156,7 @@ public class EventService {
         event.setShortSummary(request.getShortSummary());
         event.setDescription(request.getDescription());
         event.setCategory(request.getCategory());
+        event.setImageUrl(request.getImageUrl());
         event.setDate(request.getDate());
         event.setTime(request.getTime());
         event.setTotalCapacity(request.getTotalCapacity());
@@ -164,6 +166,29 @@ public class EventService {
         location.setAddress(request.getAddress());
         location.setCity(request.getCity());
         location.setCountry(request.getCountry());
+
+        // ===== UPDATE TICKETS =====
+        int totalTicketQuantity = request.getTickets().stream()
+                .mapToInt(UpdateEventRequest.TicketRequest::getQuantity)
+                .sum();
+
+        if (totalTicketQuantity > request.getTotalCapacity()) {
+            throw new IllegalArgumentException("Invalid event data");
+        }
+
+        event.getTickets().clear();
+
+        List<TicketModel> tickets = request.getTickets().stream()
+                .map(t -> TicketModel.builder()
+                        .ticketName(t.getTicketName())
+                        .price(BigDecimal.valueOf(t.getPrice()))
+                        .quantity(t.getQuantity())
+                        .event(event)
+                        .build()
+                )
+                .toList();
+
+        event.getTickets().addAll(tickets);
 
         eventRepository.save(event);
 
@@ -210,8 +235,53 @@ public class EventService {
         if (request.getCountry() != null)
             location.setCountry(request.getCountry());
 
+        // ===== UPDATE TICKETS =====
+        if (request.getTickets() != null) {
+
+            int totalTicketQuantity = request.getTickets().stream()
+                    .mapToInt(PatchEventRequest.PatchTicketRequest::getQuantity)
+                    .sum();
+
+            Integer capacity = request.getTotalCapacity() != null
+                    ? request.getTotalCapacity()
+                    : event.getTotalCapacity();
+
+            if (totalTicketQuantity > capacity) {
+                throw new IllegalArgumentException("Invalid event data");
+            }
+
+            event.getTickets().clear();
+
+            List<TicketModel> tickets = request.getTickets().stream()
+                    .map(t -> TicketModel.builder()
+                            .ticketName(t.getTicketName())
+                            .price(BigDecimal.valueOf(t.getPrice()))
+                            .quantity(t.getQuantity())
+                            .event(event)
+                            .build()
+                    )
+                    .toList();
+
+            event.getTickets().addAll(tickets);
+        }
+
         eventRepository.save(event);
 
         return eventMapper.toEventResponse(event);
+    }
+
+    public List<EventListItemResponse> searchEvents (String keyword){
+        if (keyword == null || keyword.trim().isEmpty()){
+            throw new IllegalArgumentException("Keyword must not be empty");
+        }
+
+        List<EventModel> events = eventRepository.searchEvents(keyword);
+
+        if (events.isEmpty()){
+            throw new EventSearchNotFoundException();
+        }
+        return events.stream()
+                .map(eventMapper::toListItem)
+                .toList();
     }
 }

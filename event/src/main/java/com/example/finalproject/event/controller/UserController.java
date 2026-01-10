@@ -1,7 +1,7 @@
 package com.example.finalproject.event.controller;
 
-import com.example.finalproject.event.dto.request.PatchUserRequest;
-import com.example.finalproject.event.dto.request.UpdateUserRequest;
+import com.example.finalproject.event.dto.request.user.PatchUserRequest;
+import com.example.finalproject.event.dto.request.user.UpdateUserRequest;
 import com.example.finalproject.event.model.UserModel;
 import com.example.finalproject.event.dto.response.BaseResponse;
 import com.example.finalproject.event.service.user.UserService;
