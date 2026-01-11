@@ -3,6 +3,7 @@ package com.example.finalproject.event.service.user;
 import com.example.finalproject.event.config.SecurityUtil;
 import com.example.finalproject.event.dto.request.user.PatchUserRequest;
 import com.example.finalproject.event.dto.request.user.UpdateUserRequest;
+import com.example.finalproject.event.dto.response.user.UserProfileResponse;
 import com.example.finalproject.event.exception.user.UnauthorizedAccessException;
 import com.example.finalproject.event.exception.user.UserNotFoundException;
 import com.example.finalproject.event.model.UserModel;
@@ -14,21 +15,20 @@ import java.time.LocalDateTime;
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository,
+                       UserMapper userMapper) {
         this.userRepository = userRepository;
+        this.userMapper = userMapper;
     }
 
     // ===== PUT =====
-    public UserModel updateUser(Long id, UpdateUserRequest request) {
-        UserModel user = userRepository.findById(id)
+    public UserProfileResponse updateUser(UpdateUserRequest request) {
+        String email = SecurityUtil.getCurrentUserEmail();
+
+        UserModel user = userRepository.findByEmail(email)
                 .orElseThrow(UserNotFoundException::new);
-
-        String loggedInEmail = SecurityUtil.getCurrentUserEmail();
-
-        if (!user.getEmail().equals(loggedInEmail)) {
-            throw new UnauthorizedAccessException();
-        }
 
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
@@ -37,19 +37,16 @@ public class UserService {
         user.setPhoneNumber(request.getPhoneNumber());
         user.setUpdatedAt(LocalDateTime.now());
 
-        return userRepository.save(user);
+        userRepository.save(user);
+        return userMapper.getProfileResponse(user);
     }
 
     // ===== PATCH =====
-    public UserModel patchUser(Long id, PatchUserRequest request) {
-        UserModel user = userRepository.findById(id)
+    public UserProfileResponse patchUser(PatchUserRequest request) {
+        String email = SecurityUtil.getCurrentUserEmail();
+
+        UserModel user = userRepository.findByEmail(email)
                 .orElseThrow(UserNotFoundException::new);
-
-        String loggedInEmail = SecurityUtil.getCurrentUserEmail();
-
-        if (!user.getEmail().equals(loggedInEmail)) {
-            throw new UnauthorizedAccessException();
-        }
 
         if (request.getFirstName() != null)
             user.setFirstName(request.getFirstName());
@@ -71,6 +68,17 @@ public class UserService {
 
         user.setUpdatedAt(LocalDateTime.now());
 
-        return userRepository.save(user);
+        userRepository.save(user);
+        return userMapper.getProfileResponse(user);
+    }
+
+    // ===== GET MY PROFILE =====
+    public UserProfileResponse getMyProfile(){
+        String email = SecurityUtil.getCurrentUserEmail();
+
+        UserModel user = userRepository.findByEmail(email)
+                .orElseThrow(UserNotFoundException::new);
+
+        return userMapper.getProfileResponse(user);
     }
 }

@@ -129,7 +129,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\":\"Maling@mail.com\",\r\n    \"password\":\"Password123!\"\r\n}",
+							"raw": "{\r\n    \"email\":\"daffashid28@gmail.com\",\r\n    \"password\":\"Password123\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -182,6 +182,74 @@
 								"v1",
 								"auth",
 								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Forgot Password",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"daffashid28@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8899/api/v1/auth/forgot-password",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8899",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"forgot-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"token\": \"cb501d17-34ad-4a64-8597-5bea8dce5563\",\r\n  \"password\": \"Password123\",\r\n  \"confirmPassword\": \"Password123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8899/api/v1/auth/reset-password",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8899",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"reset-password"
 							]
 						}
 					},
@@ -544,7 +612,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8899/api/v1/users/2",
+							"raw": "http://localhost:8899/api/v1/users/me",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -554,7 +622,7 @@
 								"api",
 								"v1",
 								"users",
-								"2"
+								"me"
 							]
 						}
 					},
@@ -567,7 +635,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"profilePicture\": \"https://example.com/event.jpg\"\r\n}",
+							"raw": "{\r\n  \"firstName\": \"amas\",\r\n  \"lastName\": \"sasa\",\r\n  \"profilePicture\": \"https://example.com/event.jpg\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -575,7 +643,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8899/api/v1/users/2",
+							"raw": "http://localhost:8899/api/v1/users/me",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -585,7 +653,41 @@
 								"api",
 								"v1",
 								"users",
-								"2"
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"firstName\": \"amas\",\r\n  \"lastName\": \"sasa\",\r\n  \"profilePicture\": \"https://example.com/event.jpg\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8899/api/v1/users/me",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8899",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"me"
 							]
 						}
 					},

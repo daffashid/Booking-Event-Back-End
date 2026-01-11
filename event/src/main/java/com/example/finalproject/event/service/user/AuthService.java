@@ -1,8 +1,11 @@
 package com.example.finalproject.event.service.user;
 
 import com.example.finalproject.event.config.JwtUtil;
+import com.example.finalproject.event.config.UserConstants;
 import com.example.finalproject.event.dto.request.auth.LoginRequest;
 import com.example.finalproject.event.dto.request.auth.RegisterRequest;
+import com.example.finalproject.event.dto.request.user.ForgotPasswordRequest;
+import com.example.finalproject.event.dto.request.user.ResetPasswordRequest;
 import com.example.finalproject.event.exception.user.*;
 import com.example.finalproject.event.model.UserModel;
 import com.example.finalproject.event.model.UserRole;
@@ -13,16 +16,24 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 @Service
 public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final EmailService emailService;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+    public AuthService(UserRepository userRepository,
+                       PasswordEncoder passwordEncoder,
+                       JwtUtil jwtUtil,
+                       EmailService emailService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
+        this.emailService = emailService;
     }
 
     public String register(RegisterRequest request)
@@ -57,6 +68,8 @@ public class AuthService {
         user.setPhoneNumber(request.getPhoneNumber());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(UserRole.ROLE_USER);
+
+        user.setProfilePicture(UserConstants.DEFAULT_PROFILE_PICTURE);
 
         userRepository.save(user);
 
@@ -133,4 +146,41 @@ public class AuthService {
         cookie.setMaxAge(0);
         response.addCookie(cookie);
     }
+
+    // ===== FORGOT PASSWORD =====
+    public void forgotPassword(ForgotPasswordRequest request) {
+        UserModel user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(EmailNotFoundException::new);
+
+        String token = UUID.randomUUID().toString();
+
+        user.setResetPasswordToken(token);
+        user.setResetTokenExpiredAt(LocalDateTime.now().plusMinutes(15));
+
+        userRepository.save(user);
+
+        emailService.sendResetPasswordEmail(user.getEmail(), token);
+    }
+
+    // ===== RESET PASSWORD =====
+    public void resetPassword(ResetPasswordRequest request) {
+        if (!request.getPassword().equals(request.getConfirmPassword())) {
+            throw new PasswordMismatchException();
+        }
+
+        UserModel user = userRepository.findByResetPasswordToken(request.getToken())
+                .orElseThrow(InvalidResetTokenException::new);
+
+        if (user.getResetTokenExpiredAt().isBefore(LocalDateTime.now())) {
+            throw new InvalidResetTokenException();
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setResetPasswordToken(null);
+        user.setResetTokenExpiredAt(null);
+        user.setUpdatedAt(LocalDateTime.now());
+
+        userRepository.save(user);
+    }
+
 }

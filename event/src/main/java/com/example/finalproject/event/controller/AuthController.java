@@ -2,6 +2,8 @@ package com.example.finalproject.event.controller;
 
 import com.example.finalproject.event.dto.request.auth.LoginRequest;
 import com.example.finalproject.event.dto.request.auth.RegisterRequest;
+import com.example.finalproject.event.dto.request.user.ForgotPasswordRequest;
+import com.example.finalproject.event.dto.request.user.ResetPasswordRequest;
 import com.example.finalproject.event.exception.user.*;
 import com.example.finalproject.event.dto.response.BaseResponse;
 import com.example.finalproject.event.dto.response.admin.PatchAdminResponse;
@@ -11,6 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.MailAuthenticationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
@@ -151,5 +154,26 @@ public class AuthController {
                         .toList(),
                 "authenticated", auth.isAuthenticated()
         );
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(
+            @Valid @RequestBody ForgotPasswordRequest request) {
+
+        try {
+            authService.forgotPassword(request);
+            return ResponseEntity.ok("Reset password email has been sent");
+        } catch (MailAuthenticationException e) {
+            return ResponseEntity.status(500)
+                    .body("Email service authentication failed");
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(
+            @Valid @RequestBody ResetPasswordRequest request) {
+
+        authService.resetPassword(request);
+        return ResponseEntity.ok("Password reset success");
     }
 }

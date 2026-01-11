@@ -44,6 +44,9 @@ public class UserModel {
     @Enumerated(EnumType.STRING)
     private UserRole role; // ROLE_ADMIN, ROLE_USER
 
+    private String resetPasswordToken;
+    private LocalDateTime resetTokenExpiredAt;
+
     private LocalDateTime createdAt = LocalDateTime.now();
     private LocalDateTime updatedAt;
 }

@@ -2,6 +2,7 @@ package com.example.finalproject.event.controller;
 
 import com.example.finalproject.event.dto.request.user.PatchUserRequest;
 import com.example.finalproject.event.dto.request.user.UpdateUserRequest;
+import com.example.finalproject.event.dto.response.user.UserProfileResponse;
 import com.example.finalproject.event.model.UserModel;
 import com.example.finalproject.event.dto.response.BaseResponse;
 import com.example.finalproject.event.service.user.UserService;
@@ -18,12 +19,11 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<BaseResponse<UserModel>> updateUser(
-            @PathVariable Long id,
+    @PutMapping("/me")
+    public ResponseEntity<BaseResponse<UserProfileResponse>> updateUser(
             @Valid @RequestBody UpdateUserRequest request
     ) {
-        UserModel user = userService.updateUser(id, request);
+        UserProfileResponse user = userService.updateUser(request);
 
         return ResponseEntity.ok(
                 new BaseResponse<>(
@@ -35,12 +35,11 @@ public class UserController {
         );
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<BaseResponse<UserModel>> patchUser(
-            @PathVariable Long id,
+    @PatchMapping("/me")
+    public ResponseEntity<BaseResponse<UserProfileResponse>> patchUser(
             @RequestBody PatchUserRequest request
     ) {
-        UserModel user = userService.patchUser(id, request);
+        UserProfileResponse user = userService.patchUser(request);
 
         return ResponseEntity.ok(
                 new BaseResponse<>(
@@ -48,6 +47,21 @@ public class UserController {
                         "User updated partially",
                         "00",
                         user
+                )
+        );
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<BaseResponse<UserProfileResponse>> getMyProfile(){
+        UserProfileResponse response =
+                userService.getMyProfile();
+
+        return ResponseEntity.ok(
+                new BaseResponse<>(
+                        true,
+                        "Get user profile success",
+                        "00",
+                        response
                 )
         );
     }

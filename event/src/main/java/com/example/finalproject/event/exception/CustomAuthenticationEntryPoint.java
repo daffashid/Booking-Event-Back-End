@@ -18,6 +18,13 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
             AuthenticationException ex
     ) throws IOException {
 
+        String path = request.getServletPath();
+        if (path.startsWith("/api/v1/auth")) {
+            // biarkan request lanjut, jangan kirim 401
+            response.setStatus(HttpServletResponse.SC_OK);
+            return;
+        }
+
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
 
