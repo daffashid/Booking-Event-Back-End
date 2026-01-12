@@ -19,8 +19,8 @@ public class EventListItemResponse {
     private EventCategories category;
     private LocalDate date;
     private LocalTime time;
-    private String venue;
-    private String city;
+    private LocationResponse location;        // OFFLINE
+    private OnlineEventResponse onlineEvent;  // ONLINE
     private Integer price;
     private Integer totalCapacity;
     private Integer remainingCapacity;

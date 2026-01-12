@@ -77,12 +77,25 @@ public class EventMapper {
                 .mapToInt(TicketModel::getQuantity)
                 .sum();
 
-        String venue = null;
-        String city = null;
+        LocationResponse locationResponse = null;
+        OnlineEventResponse onlineEventResponse = null;
 
+        // ===== OFFLINE =====
         if (event.getEventType() == EventType.OFFLINE && event.getLocation() != null) {
-            venue = event.getLocation().getVenue();
-            city = event.getLocation().getCity();
+            locationResponse = new LocationResponse(
+                    event.getLocation().getVenue(),
+                    event.getLocation().getAddress(),
+                    event.getLocation().getCity(),
+                    event.getLocation().getCountry()
+            );
+        }
+
+        // ===== ONLINE =====
+        if (event.getEventType() == EventType.ONLINE && event.getOnlineEvent() != null) {
+            onlineEventResponse = new OnlineEventResponse(
+                    event.getOnlineEvent().getPlatform(),
+                    event.getOnlineEvent().getLinkUrl()
+            );
         }
 
         return new EventListItemResponse(
@@ -94,14 +107,13 @@ public class EventMapper {
                 event.getCategory(),
                 event.getDate(),
                 event.getTime(),
-                venue,
-                city,
+                locationResponse,        // OFFLINE
+                onlineEventResponse,     // ONLINE
                 minPrice,
                 event.getTotalCapacity(),
                 remainingCapacity
         );
     }
-
 
     /* =========================
        DETAIL RESPONSE
