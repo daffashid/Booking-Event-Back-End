@@ -1,6 +1,7 @@
 package com.example.finalproject.event.dto.request.event;
 
 import com.example.finalproject.event.model.EventCategories;
+import com.example.finalproject.event.model.EventType;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Min;
@@ -27,6 +28,9 @@ public class CreateEventRequest {
     @NotNull(message = "This field is required")
     private EventCategories category;
 
+    @NotNull(message = "This field is required")
+    private EventType eventType;
+
     @NotBlank(message = "This field is required")
     @org.hibernate.validator.constraints.URL(
             message = "Please enter a valid image URL"
@@ -43,17 +47,14 @@ public class CreateEventRequest {
     @Min(value = 1, message = "Quota must be greater than zero")
     private Integer totalCapacity;
 
+    // ONLINE
+    private String platform;
+    private String linkUrl;
+
     // ===== LOCATION =====
-    @NotBlank(message = "This field is required")
     private String venue;
-
-    @NotBlank(message = "This field is required")
     private String address;
-
-    @NotBlank(message = "This field is required")
     private String city;
-
-    @NotBlank(message = "This field is required")
     private String country;
 
     // ===== TICKETS =====

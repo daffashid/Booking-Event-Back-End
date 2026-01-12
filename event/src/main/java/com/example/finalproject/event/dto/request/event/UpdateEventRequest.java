@@ -1,6 +1,7 @@
 package com.example.finalproject.event.dto.request.event;
 
 import com.example.finalproject.event.model.EventCategories;
+import com.example.finalproject.event.model.EventType;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Min;
@@ -16,64 +17,56 @@ import java.util.List;
 @Data
 public class UpdateEventRequest {
 
-    // ===== BASIC INFO =====
-    @NotBlank(message = "This field is required")
+    // ===== BASIC =====
+    @NotBlank
     private String title;
 
     private String shortSummary;
 
-    @NotBlank(message = "This field is required")
+    @NotBlank
     private String description;
 
-    @NotNull(message = "This field is required")
+    @NotNull
     private EventCategories category;
 
-    @NotBlank(message = "This field is required")
-    @URL(message = "Please enter a valid image URL")
+    @NotBlank
+    @URL
     private String imageUrl;
 
-    // ===== DATE & TIME =====
-    @NotNull(message = "This field is required")
-    @Future(message = "Event date must be in the future")
+    @NotNull
+    @Future
     private LocalDate date;
 
-    @NotNull(message = "This field is required")
+    @NotNull
     private LocalTime time;
 
-    // ===== CAPACITY =====
-    @NotNull(message = "This field is required")
-    @Min(value = 1, message = "Quota must be greater than zero")
+    @NotNull
+    @Min(1)
     private Integer totalCapacity;
 
-    // ===== LOCATION =====
-    @NotBlank(message = "This field is required")
+    // ===== OFFLINE =====
     private String venue;
-
-    @NotBlank(message = "This field is required")
     private String address;
-
-    @NotBlank(message = "This field is required")
     private String city;
-
-    @NotBlank(message = "This field is required")
     private String country;
 
+    // ===== ONLINE =====
+    private String platform;
+    private String linkUrl;
+
     // ===== TICKETS =====
-    @NotNull(message = "This field is required")
+    @NotNull
     private List<@Valid TicketRequest> tickets;
 
     @Data
     public static class TicketRequest {
-
-        @NotBlank(message = "This field is required")
+        @NotBlank
         private String ticketName;
 
-        @NotNull(message = "This field is required")
-        @Min(value = 1, message = "Price must be greater than zero")
+        @Min(1)
         private Integer price;
 
-        @NotNull(message = "This field is required")
-        @Min(value = 1, message = "Quantity must be greater than zero")
+        @Min(1)
         private Integer quantity;
     }
 }

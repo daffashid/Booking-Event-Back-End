@@ -4,16 +4,11 @@ import com.example.finalproject.event.dto.request.event.CreateEventRequest;
 import com.example.finalproject.event.dto.request.event.PatchEventRequest;
 import com.example.finalproject.event.dto.request.event.UpdateEventRequest;
 import com.example.finalproject.event.dto.response.event.*;
-import com.example.finalproject.event.exception.event.CategoryEventNotFoundException;
-import com.example.finalproject.event.exception.event.EventNotFoundException;
-import com.example.finalproject.event.exception.event.EventSearchNotFoundException;
-import com.example.finalproject.event.exception.event.NoActiveEventException;
-import com.example.finalproject.event.model.EventCategories;
-import com.example.finalproject.event.model.EventModel;
-import com.example.finalproject.event.model.LocationModel;
-import com.example.finalproject.event.model.TicketModel;
+import com.example.finalproject.event.exception.event.*;
+import com.example.finalproject.event.model.*;
 import com.example.finalproject.event.repository.EventRepository;
 import com.example.finalproject.event.repository.LocationRepository;
+import com.example.finalproject.event.repository.OnlineEventRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,64 +23,83 @@ public class EventService {
     private final EventRepository eventRepository;
     private final LocationRepository locationRepository;
     private final EventMapper eventMapper;
+    private final OnlineEventRepository onlineEventRepository;
 
     public EventService(EventRepository eventRepository,
                         ImageService imageService,
                         LocationRepository locationRepository,
-                        EventMapper eventMapper) {
+                        EventMapper eventMapper,
+                        OnlineEventRepository onlineEventRepository) {
         this.eventRepository = eventRepository;
         this.imageService = imageService;
         this.locationRepository = locationRepository;
         this.eventMapper = eventMapper;
+        this.onlineEventRepository = onlineEventRepository;
     }
-    public EventModel createEvent(CreateEventRequest request) {
 
-        LocationModel location = LocationModel.builder()
-                .venue(request.getVenue())
-                .address(request.getAddress())
-                .city(request.getCity())
-                .country(request.getCountry())
-                .build();
+    @Transactional
+    public EventResponse createEvent(CreateEventRequest request) {
 
-        locationRepository.save(location);
-
-        EventModel event = EventModel.builder()
+        EventModel.EventModelBuilder eventBuilder = EventModel.builder()
                 .title(request.getTitle())
                 .shortSummary(request.getShortSummary())
                 .description(request.getDescription())
                 .category(request.getCategory())
+                .eventType(request.getEventType())
                 .imageUrl(request.getImageUrl())
                 .date(request.getDate())
                 .time(request.getTime())
-                .totalCapacity(request.getTotalCapacity())
-                .location(location)
-                .build();
+                .totalCapacity(request.getTotalCapacity());
 
-        if (request.getTickets() != null && !request.getTickets().isEmpty()) {
+        // ===== OFFLINE =====
+        if (request.getEventType() == EventType.OFFLINE) {
 
-            int totalTicketQuantity = request.getTickets().stream()
-                    .mapToInt(t -> t.getQuantity())
-                    .sum();
+            LocationModel location = LocationModel.builder()
+                    .venue(request.getVenue())
+                    .address(request.getAddress())
+                    .city(request.getCity())
+                    .country(request.getCountry())
+                    .build();
 
-            if (totalTicketQuantity != request.getTotalCapacity()) {
-                throw new IllegalArgumentException(
-                        "Total ticket quantity must equal totalCapacity"
-                );
-            }
-
-            List<TicketModel> tickets = request.getTickets().stream()
-                    .map(t -> TicketModel.builder()
-                            .ticketName(t.getTicketName())
-                            .price(BigDecimal.valueOf(t.getPrice()))
-                            .quantity(t.getQuantity())
-                            .event(event)
-                            .build())
-                    .toList();
-
-            event.setTickets(tickets);
+            locationRepository.save(location);
+            eventBuilder.location(location);
         }
 
-        return eventRepository.save(event);
+        // ===== ONLINE =====
+        if (request.getEventType() == EventType.ONLINE) {
+
+            OnlineEventModel onlineEvent = OnlineEventModel.builder()
+                    .platform(request.getPlatform())
+                    .linkUrl(request.getLinkUrl())
+                    .build();
+
+            onlineEventRepository.save(onlineEvent);
+            eventBuilder.onlineEvent(onlineEvent);
+        }
+
+        EventModel event = eventBuilder.build();
+
+        // ===== TICKETS =====
+        int totalTicketQty = request.getTickets().stream()
+                .mapToInt(CreateEventRequest.TicketRequest::getQuantity)
+                .sum();
+
+        if (totalTicketQty != request.getTotalCapacity()) {
+            throw new IllegalArgumentException("Ticket quantity must match capacity");
+        }
+
+        List<TicketModel> tickets = request.getTickets().stream()
+                .map(t -> TicketModel.builder()
+                        .ticketName(t.getTicketName())
+                        .price(BigDecimal.valueOf(t.getPrice()))
+                        .quantity(t.getQuantity())
+                        .event(event)
+                        .build())
+                .toList();
+
+        event.setTickets(tickets);
+        EventModel savedEvent = eventRepository.save(event);
+        return eventMapper.toEventResponse(savedEvent);
     }
 
     public List<EventListItemResponse> getAllEvents() {
@@ -147,11 +161,16 @@ public class EventService {
         eventRepository.deleteById(eventId);
     }
 
+    // =========================
+    // PUT (FULL UPDATE)
+    // =========================
+    @Transactional
     public EventResponse updateEvent(Long eventId, UpdateEventRequest request) {
 
         EventModel event = eventRepository.findById(eventId)
                 .orElseThrow(EventNotFoundException::new);
 
+        // ===== BASIC =====
         event.setTitle(request.getTitle());
         event.setShortSummary(request.getShortSummary());
         event.setDescription(request.getDescription());
@@ -161,19 +180,38 @@ public class EventService {
         event.setTime(request.getTime());
         event.setTotalCapacity(request.getTotalCapacity());
 
-        LocationModel location = event.getLocation();
-        location.setVenue(request.getVenue());
-        location.setAddress(request.getAddress());
-        location.setCity(request.getCity());
-        location.setCountry(request.getCountry());
+        // ===== OFFLINE =====
+        if (event.getEventType() == EventType.OFFLINE) {
+            if (request.getPlatform() != null || request.getLinkUrl() != null) {
+                throw new InvalidEventTypeFieldException();
+            }
+            LocationModel location = event.getLocation();
 
-        // ===== UPDATE TICKETS =====
-        int totalTicketQuantity = request.getTickets().stream()
+            location.setVenue(request.getVenue());
+            location.setAddress(request.getAddress());
+            location.setCity(request.getCity());
+            location.setCountry(request.getCountry());
+        }
+
+        // ===== ONLINE =====
+        if (event.getEventType() == EventType.ONLINE) {
+            if (request.getVenue() != null || request.getAddress() != null ||
+                    request.getCity() != null || request.getCountry() != null) {
+                throw new InvalidEventTypeFieldException();
+            }
+            OnlineEventModel online = event.getOnlineEvent();
+
+            online.setPlatform(request.getPlatform());
+            online.setLinkUrl(request.getLinkUrl());
+        }
+
+        // ===== TICKETS =====
+        int totalQty = request.getTickets().stream()
                 .mapToInt(UpdateEventRequest.TicketRequest::getQuantity)
                 .sum();
 
-        if (totalTicketQuantity > request.getTotalCapacity()) {
-            throw new IllegalArgumentException("Invalid event data");
+        if (totalQty != request.getTotalCapacity()) {
+            throw new IllegalArgumentException("Ticket quantity must match capacity");
         }
 
         event.getTickets().clear();
@@ -185,22 +223,23 @@ public class EventService {
                         .quantity(t.getQuantity())
                         .event(event)
                         .build()
-                )
-                .toList();
+                ).toList();
 
         event.getTickets().addAll(tickets);
 
-        eventRepository.save(event);
-
-        return eventMapper.toEventResponse(event);
+        return eventMapper.toEventResponse(eventRepository.save(event));
     }
 
+    // =========================
+    // PATCH (PARTIAL UPDATE)
+    // =========================
+    @Transactional
     public EventResponse patchEvent(Long eventId, PatchEventRequest request) {
 
         EventModel event = eventRepository.findById(eventId)
                 .orElseThrow(EventNotFoundException::new);
 
-        // ===== BASIC FIELDS =====
+        // ===== BASIC =====
         if (request.getTitle() != null)
             event.setTitle(request.getTitle());
 
@@ -213,65 +252,79 @@ public class EventService {
         if (request.getCategory() != null)
             event.setCategory(request.getCategory());
 
+        if (request.getImageUrl() != null)
+            event.setImageUrl(request.getImageUrl());
+
         if (request.getDate() != null)
             event.setDate(request.getDate());
 
         if (request.getTime() != null)
             event.setTime(request.getTime());
 
-        // ===== IMAGE =====
-        if (request.getImageUrl() != null) {
-            event.setImageUrl(request.getImageUrl());
-        }
-
-        // ===== LOCATION =====
-        LocationModel location = event.getLocation();
-        if (request.getVenue() != null)
-            location.setVenue(request.getVenue());
-        if (request.getAddress() != null)
-            location.setAddress(request.getAddress());
-        if (request.getCity() != null)
-            location.setCity(request.getCity());
-        if (request.getCountry() != null)
-            location.setCountry(request.getCountry());
-
-        // ===== CAPACITY =====
-        if (request.getTotalCapacity() != null) {
+        if (request.getTotalCapacity() != null)
             event.setTotalCapacity(request.getTotalCapacity());
+
+        // ===== OFFLINE PATCH =====
+        if (event.getEventType() == EventType.OFFLINE && event.getLocation() != null) {
+            if (request.getPlatform() != null || request.getLinkUrl() != null) {
+                throw new InvalidEventTypeFieldException();
+            }
+            if (request.getVenue() != null)
+                event.getLocation().setVenue(request.getVenue());
+
+            if (request.getAddress() != null)
+                event.getLocation().setAddress(request.getAddress());
+
+            if (request.getCity() != null)
+                event.getLocation().setCity(request.getCity());
+
+            if (request.getCountry() != null)
+                event.getLocation().setCountry(request.getCountry());
         }
 
-        // ===== TICKETS (OPTIONAL) =====
-        if (request.getTickets() != null) {
+        // ===== ONLINE PATCH =====
+        if (event.getEventType() == EventType.ONLINE && event.getOnlineEvent() != null) {
+            if (request.getVenue() != null || request.getAddress() != null ||
+                    request.getCity() != null || request.getCountry() != null) {
+                throw new InvalidEventTypeFieldException();
+            }
+            if (request.getPlatform() != null)
+                event.getOnlineEvent().setPlatform(request.getPlatform());
 
-            int totalTicketQuantity = request.getTickets().stream()
-                    .mapToInt(PatchEventRequest.PatchTicketRequest::getQuantity)
-                    .sum();
+            if (request.getLinkUrl() != null)
+                event.getOnlineEvent().setLinkUrl(request.getLinkUrl());
+        }
+
+        // ===== TICKETS PATCH =====
+        if (request.getTickets() != null) {
 
             int capacity = request.getTotalCapacity() != null
                     ? request.getTotalCapacity()
                     : event.getTotalCapacity();
 
-            if (totalTicketQuantity > capacity) {
-                throw new IllegalArgumentException("Ticket quantity exceeds event capacity");
+            int totalQty = request.getTickets().stream()
+                    .mapToInt(PatchEventRequest.PatchTicketRequest::getQuantity)
+                    .sum();
+
+            if (totalQty > capacity) {
+                throw new IllegalArgumentException("Ticket quantity exceeds capacity");
             }
 
             event.getTickets().clear();
 
-            List<TicketModel> tickets = request.getTickets().stream()
-                    .map(t -> TicketModel.builder()
-                            .ticketName(t.getTicketName())
-                            .price(BigDecimal.valueOf(t.getPrice()))
-                            .quantity(t.getQuantity())
-                            .event(event)
-                            .build()
-                    )
-                    .toList();
-
-            event.getTickets().addAll(tickets);
+            event.getTickets().addAll(
+                    request.getTickets().stream()
+                            .map(t -> TicketModel.builder()
+                                    .ticketName(t.getTicketName())
+                                    .price(BigDecimal.valueOf(t.getPrice()))
+                                    .quantity(t.getQuantity())
+                                    .event(event)
+                                    .build()
+                            ).toList()
+            );
         }
 
-        eventRepository.save(event);
-        return eventMapper.toEventResponse(event);
+        return eventMapper.toEventResponse(eventRepository.save(event));
     }
 
 

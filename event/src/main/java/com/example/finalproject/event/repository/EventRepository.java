@@ -27,13 +27,13 @@ public interface EventRepository extends JpaRepository<EventModel, Long> {
        GET ACTIVE EVENTS BY CATEGORY
        ========================= */
     @Query("""
-        SELECT DISTINCT e
-        FROM EventModel e
-        JOIN e.tickets t
-        WHERE e.category = :category
-        GROUP BY e
-        HAVING SUM(t.quantity) > 0
-    """)
+    SELECT DISTINCT e
+    FROM EventModel e
+    LEFT JOIN e.tickets t
+    WHERE e.category = :category
+    GROUP BY e
+    HAVING COALESCE(SUM(t.quantity), 0) > 0
+""")
     List<EventModel> findActiveEventsByCategory(
             @Param("category") EventCategories category
     );
@@ -42,15 +42,16 @@ public interface EventRepository extends JpaRepository<EventModel, Long> {
        GET ACTIVE EVENTS BY SEARCH
        ========================= */
     @Query("""
-    SELECT DISTINCT e
-    FROM EventModel e
-    JOIN e.tickets t
-    WHERE
-        LOWER(e.title) LIKE LOWER(CONCAT('%', :keyword, '%'))
-        OR LOWER(e.description) LIKE LOWER(CONCAT('%', :keyword, '%'))
-        OR LOWER(e.location.city) LIKE LOWER(CONCAT('%', :keyword, '%'))
-    GROUP BY e
-    HAVING SUM(t.quantity) > 0
+SELECT DISTINCT e
+FROM EventModel e
+LEFT JOIN e.tickets t
+WHERE
+    LOWER(e.title) LIKE LOWER(CONCAT('%', :keyword, '%'))
+    OR LOWER(e.description) LIKE LOWER(CONCAT('%', :keyword, '%'))
+    OR LOWER(CAST(e.category AS string)) LIKE LOWER(CONCAT('%', :keyword, '%'))
+GROUP BY e
+HAVING COALESCE(SUM(t.quantity), 0) > 0
 """)
     List<EventModel> searchEvents(@Param("keyword") String keyword);
+
 }

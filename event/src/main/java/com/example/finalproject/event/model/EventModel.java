@@ -34,6 +34,10 @@ public class EventModel {
     @Enumerated(EnumType.STRING)
     private EventCategories category;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private EventType eventType;   // ONLINE / OFFLINE
+
     private String imageUrl;
 
     @Future(message = "Event date must be in the future")
@@ -44,9 +48,15 @@ public class EventModel {
     @Min(value = 0)
     private Integer totalCapacity;
 
+    // ===== OFFLINE =====
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "location_id", nullable = false)
+    @JoinColumn(name = "location_id", nullable = true)
     private LocationModel location;
+
+    // ===== ONLINE =====
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "online_event_id", nullable = true)
+    private OnlineEventModel onlineEvent;
 
     @OneToMany(
             mappedBy = "event",

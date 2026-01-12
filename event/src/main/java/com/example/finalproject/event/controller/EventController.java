@@ -7,6 +7,7 @@
     import com.example.finalproject.event.exception.event.CategoryEventNotFoundException;
     import com.example.finalproject.event.exception.event.EventNotFoundException;
     import com.example.finalproject.event.exception.event.EventSearchNotFoundException;
+    import com.example.finalproject.event.exception.event.InvalidEventTypeFieldException;
     import com.example.finalproject.event.model.EventCategories;
     import com.example.finalproject.event.model.EventModel;
     import com.example.finalproject.event.dto.response.BaseResponse;
@@ -35,40 +36,32 @@
         public ResponseEntity<BaseResponse<EventResponse>> createEvent(
                 @Valid @RequestBody CreateEventRequest request
         ) {
-            EventModel event = eventService.createEvent(request);
+            BaseResponse<EventResponse> response = new BaseResponse<>();
 
-            EventResponse eventResponse = new EventResponse(
-                    event.getTitle(),
-                    event.getShortSummary(),
-                    event.getDescription(),
-                    event.getImageUrl(),
-                    event.getDate(),
-                    event.getTime(),
-                    event.getCategory(),
-                    event.getTotalCapacity(),
-                    new LocationResponse(
-                            event.getLocation().getVenue(),
-                            event.getLocation().getCity()
-                    ),
-                    event.getTickets().stream()
-                            .map(t -> new TicketResponse(
-                                    t.getTicketName(),
-                                    t.getPrice(),
-                                    t.getQuantity()
-                            ))
-                            .toList()
+            try {
+                EventResponse eventResponse = eventService.createEvent(request);
 
-            );
+                response.setData(eventResponse);
+                response.setSuccess(true);
+                response.setMessage("Event created successfully");
+                response.setErrorCode("00");
 
-            BaseResponse<EventResponse> response =
-                    new BaseResponse<>(
-                            true,
-                            "Event created successfully",
-                            "00",
-                            eventResponse
-                    );
+                return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            } catch (IllegalArgumentException e) {
+                response.setSuccess(false);
+                response.setMessage(e.getMessage());
+                response.setErrorCode("02");
+
+                return ResponseEntity.badRequest().body(response);
+
+            } catch (Exception e) {
+                response.setSuccess(false);
+                response.setMessage("Failed to create event");
+                response.setErrorCode("99");
+
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            }
         }
 
         @GetMapping
@@ -98,33 +91,46 @@
             return ResponseEntity.badRequest().body(response);
         }
 
-        @GetMapping("/category/{category}")
+        @GetMapping("/category")
         public ResponseEntity<BaseResponse<List<EventListItemResponse>>> getByCategory(
-                @PathVariable EventCategories category
+                @RequestParam String category
         ) {
-
             BaseResponse<List<EventListItemResponse>> response = new BaseResponse<>();
 
             try {
-                response.setData(eventService.getEventsByCategory(category));
+                EventCategories eventCategory =
+                        EventCategories.valueOf(category.toUpperCase());
+
+                response.setData(eventService.getEventsByCategory(eventCategory));
                 response.setMessage("Events fetched successfully");
                 response.setSuccess(true);
                 response.setErrorCode("00");
 
                 return ResponseEntity.ok(response);
 
+            } catch (IllegalArgumentException e) {
+                response.setSuccess(false);
+                response.setMessage("Invalid category value");
+                response.setErrorCode("02");
+
+                return ResponseEntity.badRequest().body(response);
+
             } catch (CategoryEventNotFoundException e) {
+                response.setSuccess(false);
                 response.setMessage("No events found in this category");
                 response.setErrorCode("01");
 
+                return ResponseEntity.badRequest().body(response);
+
             } catch (Exception e) {
+                response.setSuccess(false);
                 response.setMessage("Failed to load events. Please try again");
                 response.setErrorCode("99");
-            }
 
-            response.setSuccess(false);
-            return ResponseEntity.badRequest().body(response);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            }
         }
+
 
         @GetMapping("/{id}")
         public ResponseEntity<BaseResponse<EventDetailResponse>> getEventDetail(
@@ -203,27 +209,40 @@
 
             try {
                 response.setData(eventService.updateEvent(id, request));
-                response.setMessage("Event updated successfully");
                 response.setSuccess(true);
+                response.setMessage("Event updated successfully");
                 response.setErrorCode("00");
 
                 return ResponseEntity.ok(response);
 
             } catch (EventNotFoundException e) {
-                response.setMessage("Event not found");
+                response.setSuccess(false);
+                response.setMessage(e.getMessage()); // dari exception
                 response.setErrorCode("01");
 
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+
+            } catch (InvalidEventTypeFieldException e) {
+                response.setSuccess(false);
+                response.setMessage(e.getMessage()); // dari exception
+                response.setErrorCode("03");
+
+                return ResponseEntity.badRequest().body(response);
+
             } catch (IllegalArgumentException e) {
-                response.setMessage("Invalid event data");
+                response.setSuccess(false);
+                response.setMessage(e.getMessage());
                 response.setErrorCode("02");
 
+                return ResponseEntity.badRequest().body(response);
+
             } catch (Exception e) {
+                response.setSuccess(false);
                 response.setMessage("Failed to update event");
                 response.setErrorCode("99");
-            }
 
-            response.setSuccess(false);
-            return ResponseEntity.badRequest().body(response);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            }
         }
 
         @PatchMapping("/{id}")
@@ -236,27 +255,40 @@
 
             try {
                 response.setData(eventService.patchEvent(id, request));
-                response.setMessage("Event updated successfully");
                 response.setSuccess(true);
+                response.setMessage("Event updated successfully");
                 response.setErrorCode("00");
 
                 return ResponseEntity.ok(response);
 
             } catch (EventNotFoundException e) {
-                response.setMessage("Event not found");
+                response.setSuccess(false);
+                response.setMessage(e.getMessage()); // dari exception
                 response.setErrorCode("01");
 
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+
+            } catch (InvalidEventTypeFieldException e) {
+                response.setSuccess(false);
+                response.setMessage(e.getMessage()); // dari exception
+                response.setErrorCode("03");
+
+                return ResponseEntity.badRequest().body(response);
+
             } catch (IllegalArgumentException e) {
-                response.setMessage("Invalid event data");
+                response.setSuccess(false);
+                response.setMessage(e.getMessage());
                 response.setErrorCode("02");
 
+                return ResponseEntity.badRequest().body(response);
+
             } catch (Exception e) {
+                response.setSuccess(false);
                 response.setMessage("Failed to update event");
                 response.setErrorCode("99");
-            }
 
-            response.setSuccess(false);
-            return ResponseEntity.badRequest().body(response);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            }
         }
 
         @GetMapping("/search")

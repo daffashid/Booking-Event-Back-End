@@ -1,6 +1,7 @@
 package com.example.finalproject.event.dto.response.event;
 
 import com.example.finalproject.event.model.EventCategories;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,6 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 @Builder
 @AllArgsConstructor
@@ -24,8 +26,10 @@ public class EventDetailResponse {
 
     private EventCategories category;
     private Integer totalCapacity;
-
+    // OFFLINE
     private LocationResponse location;
+    // ONLINE
+    private OnlineEventResponse onlineEvent;
     private List<TicketResponse> tickets;
 
     // tambahan khusus detail

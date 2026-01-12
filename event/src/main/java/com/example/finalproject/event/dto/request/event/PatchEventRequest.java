@@ -20,13 +20,16 @@ public class PatchEventRequest {
     private LocalTime time;
     private Integer totalCapacity;
 
-    // Location
+    // OFFLINE
     private String venue;
     private String address;
     private String city;
     private String country;
 
-    //tickets
+    // ONLINE
+    private String platform;
+    private String linkUrl;
+
     private List<@Valid PatchTicketRequest> tickets;
 
     @Data

@@ -2,8 +2,11 @@ package com.example.finalproject.event.service.event;
 
 import com.example.finalproject.event.dto.response.event.*;
 import com.example.finalproject.event.model.EventModel;
+import com.example.finalproject.event.model.EventType;
 import com.example.finalproject.event.model.TicketModel;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class EventMapper {
@@ -12,7 +15,25 @@ public class EventMapper {
        CREATE / UPDATE RESPONSE
        ========================= */
     public EventResponse toEventResponse(EventModel event) {
+        LocationResponse locationResponse = null;
+        OnlineEventResponse onlineEventResponse = null;
+
+        if (event.getEventType() == EventType.OFFLINE && event.getLocation() != null) {
+            locationResponse = new LocationResponse(
+                    event.getLocation().getVenue(),
+                    event.getLocation().getAddress(),
+                    event.getLocation().getCity(),
+                    event.getLocation().getCountry()
+            );
+        }
+        if (event.getEventType() == EventType.ONLINE && event.getOnlineEvent() != null) {
+            onlineEventResponse = new OnlineEventResponse(
+                    event.getOnlineEvent().getPlatform(),
+                    event.getOnlineEvent().getLinkUrl()
+            );
+        }
         return new EventResponse(
+                event.getEventId(),
                 event.getTitle(),
                 event.getShortSummary(),
                 event.getDescription(),
@@ -20,36 +41,50 @@ public class EventMapper {
                 event.getDate(),
                 event.getTime(),
                 event.getCategory(),
+                event.getEventType(),
                 event.getTotalCapacity(),
-                new LocationResponse(
-                        event.getLocation().getVenue(),
-                        event.getLocation().getCity()
-                ),
-                event.getTickets().stream()
-                        .map(t -> new TicketResponse(
-                                t.getTicketName(),
-                                t.getPrice(),
-                                t.getQuantity()
-                        ))
-                        .toList()
+                locationResponse,
+                onlineEventResponse,
+                mapTickets(event.getTickets())
         );
+    }
+
+    private List<TicketResponse> mapTickets(List<TicketModel> tickets) {
+        return tickets.stream()
+                .map(t -> new TicketResponse(
+                        t.getTicketName(),
+                        t.getPrice(),
+                        t.getQuantity()
+                ))
+                .toList();
     }
 
     /* =========================
        LIST ITEM RESPONSE
        ========================= */
     public EventListItemResponse toListItem(EventModel event) {
+
         int minPrice = event.getTickets() == null || event.getTickets().isEmpty()
                 ? 0
                 : event.getTickets().stream()
                 .mapToInt(t -> t.getPrice().intValue())
                 .min()
                 .orElse(0);
+
         int remainingCapacity = event.getTickets() == null || event.getTickets().isEmpty()
                 ? 0
                 : event.getTickets().stream()
                 .mapToInt(TicketModel::getQuantity)
                 .sum();
+
+        String venue = null;
+        String city = null;
+
+        if (event.getEventType() == EventType.OFFLINE && event.getLocation() != null) {
+            venue = event.getLocation().getVenue();
+            city = event.getLocation().getCity();
+        }
+
         return new EventListItemResponse(
                 event.getEventId(),
                 event.getTitle(),
@@ -58,13 +93,14 @@ public class EventMapper {
                 event.getCategory(),
                 event.getDate(),
                 event.getTime(),
-                event.getLocation().getVenue(),
-                event.getLocation().getCity(),
+                venue,
+                city,
                 minPrice,
                 event.getTotalCapacity(),
                 remainingCapacity
         );
     }
+
 
     /* =========================
        DETAIL RESPONSE
@@ -73,6 +109,25 @@ public class EventMapper {
             EventModel event,
             int remainingQuota
     ) {
+        LocationResponse locationResponse = null;
+        OnlineEventResponse onlineEventResponse = null;
+
+        if (event.getEventType() == EventType.OFFLINE && event.getLocation() != null) {
+            locationResponse = new LocationResponse(
+                    event.getLocation().getVenue(),
+                    event.getLocation().getAddress(),
+                    event.getLocation().getCity(),
+                    event.getLocation().getCountry()
+            );
+        }
+
+        if (event.getEventType() == EventType.ONLINE && event.getOnlineEvent() != null) {
+            onlineEventResponse = new OnlineEventResponse(
+                    event.getOnlineEvent().getPlatform(),
+                    event.getOnlineEvent().getLinkUrl()
+            );
+        }
+
         return EventDetailResponse.builder()
                 .title(event.getTitle())
                 .shortSummary(event.getShortSummary())
@@ -83,12 +138,12 @@ public class EventMapper {
                 .category(event.getCategory())
                 .totalCapacity(event.getTotalCapacity())
                 .remainingCapacity(remainingQuota)
-                .location(new LocationResponse(
-                        event.getLocation().getVenue(),
-                        event.getLocation().getCity()
-                ))
+                .location(locationResponse)          // OFFLINE
+                .onlineEvent(onlineEventResponse)    // ONLINE
                 .tickets(
-                        event.getTickets().stream()
+                        event.getTickets() == null
+                                ? List.of()
+                                : event.getTickets().stream()
                                 .map(t -> new TicketResponse(
                                         t.getTicketName(),
                                         t.getPrice(),
@@ -99,6 +154,7 @@ public class EventMapper {
                 .warningMessage(null)
                 .build();
     }
+
 
     public EventListAdminResponse toAdminList(EventModel event) {
 
@@ -115,16 +171,25 @@ public class EventMapper {
                 .min()
                 .orElse(0);
 
+        String venue = null;
+        String city = null;
+
+        if (event.getEventType() == EventType.OFFLINE && event.getLocation() != null) {
+            venue = event.getLocation().getVenue();
+            city = event.getLocation().getCity();
+        }
+
         return new EventListAdminResponse(
                 event.getEventId(),
                 event.getTitle(),
                 event.getCategory(),
                 event.getDate(),
-                event.getLocation().getVenue(),
-                event.getLocation().getCity(),
+                venue,
+                city,
                 minPrice,
                 event.getTotalCapacity(),
                 remainingQuota
         );
     }
+
 }

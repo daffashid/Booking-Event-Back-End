@@ -5,9 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class LocationResponse {
-    private String venue;
-    private String address;
-    private String city;
-    private String country;
+public class OnlineEventResponse {
+    private String platform;
+    private String linkUrl;
 }
