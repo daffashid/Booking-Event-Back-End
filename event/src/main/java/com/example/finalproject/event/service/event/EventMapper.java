@@ -90,6 +90,7 @@ public class EventMapper {
                 event.getTitle(),
                 event.getShortSummary(),
                 event.getImageUrl(),
+                event.getEventType(),
                 event.getCategory(),
                 event.getDate(),
                 event.getTime(),
@@ -135,6 +136,7 @@ public class EventMapper {
                 .imageUrl(event.getImageUrl())
                 .date(event.getDate())
                 .time(event.getTime())
+                .eventType(event.getEventType())
                 .category(event.getCategory())
                 .totalCapacity(event.getTotalCapacity())
                 .remainingCapacity(remainingQuota)

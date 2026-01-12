@@ -1,6 +1,7 @@
 package com.example.finalproject.event.dto.response.event;
 
 import com.example.finalproject.event.model.EventCategories;
+import com.example.finalproject.event.model.EventType;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,7 +24,7 @@ public class EventDetailResponse {
 
     private LocalDate date;
     private LocalTime time;
-
+    private EventType eventType;
     private EventCategories category;
     private Integer totalCapacity;
     // OFFLINE

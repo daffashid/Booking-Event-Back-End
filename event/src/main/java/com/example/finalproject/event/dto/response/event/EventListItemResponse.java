@@ -1,6 +1,7 @@
 package com.example.finalproject.event.dto.response.event;
 
 import com.example.finalproject.event.model.EventCategories;
+import com.example.finalproject.event.model.EventType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -14,6 +15,7 @@ public class EventListItemResponse {
     private String title;
     private String shortSummary;
     private String imageUrl;
+    private EventType eventType;
     private EventCategories category;
     private LocalDate date;
     private LocalTime time;
