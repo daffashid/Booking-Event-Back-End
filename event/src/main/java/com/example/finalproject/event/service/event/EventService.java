@@ -200,6 +200,7 @@ public class EventService {
         EventModel event = eventRepository.findById(eventId)
                 .orElseThrow(EventNotFoundException::new);
 
+        // ===== BASIC FIELDS =====
         if (request.getTitle() != null)
             event.setTitle(request.getTitle());
 
@@ -218,13 +219,12 @@ public class EventService {
         if (request.getTime() != null)
             event.setTime(request.getTime());
 
-        if (request.getTotalCapacity() != null) {
-            event.setTotalCapacity(request.getTotalCapacity());
-            if (request.getTotalCapacity() == 0 && event.getTickets() != null) {
-                event.getTickets()
-                        .forEach(ticket -> ticket.setQuantity(0));
-            }
+        // ===== IMAGE =====
+        if (request.getImageUrl() != null) {
+            event.setImageUrl(request.getImageUrl());
         }
+
+        // ===== LOCATION =====
         LocationModel location = event.getLocation();
         if (request.getVenue() != null)
             location.setVenue(request.getVenue());
@@ -235,19 +235,24 @@ public class EventService {
         if (request.getCountry() != null)
             location.setCountry(request.getCountry());
 
-        // ===== UPDATE TICKETS =====
+        // ===== CAPACITY =====
+        if (request.getTotalCapacity() != null) {
+            event.setTotalCapacity(request.getTotalCapacity());
+        }
+
+        // ===== TICKETS (OPTIONAL) =====
         if (request.getTickets() != null) {
 
             int totalTicketQuantity = request.getTickets().stream()
                     .mapToInt(PatchEventRequest.PatchTicketRequest::getQuantity)
                     .sum();
 
-            Integer capacity = request.getTotalCapacity() != null
+            int capacity = request.getTotalCapacity() != null
                     ? request.getTotalCapacity()
                     : event.getTotalCapacity();
 
             if (totalTicketQuantity > capacity) {
-                throw new IllegalArgumentException("Invalid event data");
+                throw new IllegalArgumentException("Ticket quantity exceeds event capacity");
             }
 
             event.getTickets().clear();
@@ -266,9 +271,10 @@ public class EventService {
         }
 
         eventRepository.save(event);
-
         return eventMapper.toEventResponse(event);
     }
+
+
 
     public List<EventListItemResponse> searchEvents (String keyword){
         if (keyword == null || keyword.trim().isEmpty()){

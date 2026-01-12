@@ -15,6 +15,7 @@ public class PatchEventRequest {
     private String shortSummary;
     private String description;
     private EventCategories category;
+    private String imageUrl;
     private LocalDate date;
     private LocalTime time;
     private Integer totalCapacity;

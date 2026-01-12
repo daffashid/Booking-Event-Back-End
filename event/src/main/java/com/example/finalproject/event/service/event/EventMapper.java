@@ -45,13 +45,24 @@ public class EventMapper {
                 .mapToInt(t -> t.getPrice().intValue())
                 .min()
                 .orElse(0);
+        int remainingCapacity = event.getTickets() == null || event.getTickets().isEmpty()
+                ? 0
+                : event.getTickets().stream()
+                .mapToInt(TicketModel::getQuantity)
+                .sum();
         return new EventListItemResponse(
+                event.getEventId(),
                 event.getTitle(),
+                event.getShortSummary(),
+                event.getImageUrl(),
                 event.getCategory(),
                 event.getDate(),
+                event.getTime(),
                 event.getLocation().getVenue(),
                 event.getLocation().getCity(),
-                minPrice
+                minPrice,
+                event.getTotalCapacity(),
+                remainingCapacity
         );
     }
 
