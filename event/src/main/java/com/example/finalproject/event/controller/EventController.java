@@ -8,8 +8,7 @@
     import com.example.finalproject.event.exception.event.EventNotFoundException;
     import com.example.finalproject.event.exception.event.EventSearchNotFoundException;
     import com.example.finalproject.event.exception.event.InvalidEventTypeFieldException;
-    import com.example.finalproject.event.model.EventCategories;
-    import com.example.finalproject.event.model.EventModel;
+    import com.example.finalproject.event.model.event.EventCategories;
     import com.example.finalproject.event.dto.response.BaseResponse;
     import com.example.finalproject.event.service.event.EventService;
     import jakarta.validation.Valid;
@@ -17,7 +16,6 @@
     import org.springframework.http.ResponseEntity;
     import org.springframework.security.access.prepost.PreAuthorize;
     import org.springframework.web.bind.annotation.*;
-    import org.springframework.web.multipart.MultipartFile;
 
     import java.util.List;
 

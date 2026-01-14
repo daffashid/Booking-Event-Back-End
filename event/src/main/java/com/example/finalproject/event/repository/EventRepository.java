@@ -1,7 +1,7 @@
 package com.example.finalproject.event.repository;
 
-import com.example.finalproject.event.model.EventCategories;
-import com.example.finalproject.event.model.EventModel;
+import com.example.finalproject.event.model.event.EventCategories;
+import com.example.finalproject.event.model.event.EventModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

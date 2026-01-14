@@ -1,4 +1,4 @@
-package com.example.finalproject.event.model;
+package com.example.finalproject.event.model.event;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

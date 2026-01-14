@@ -1,4 +1,4 @@
-package com.example.finalproject.event.model;
+package com.example.finalproject.event.model.user;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;

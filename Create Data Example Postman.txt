@@ -1,0 +1,115 @@
+OFFLINE
+
+{
+  "title": "Jakarta Marathon 2026",
+  "shortSummary": "City street run",
+  "description": "Annual marathon through the heart of Jakarta.",
+  "category": "SPORTS",
+  "eventType": "OFFLINE",
+  "imageUrl": "https://example.com/marathon.jpg",
+  "date": "2026-05-20",
+  "time": "05:00",
+  "totalCapacity": 5000,
+  "venue": "Gelora Bung Karno",
+  "address": "Senayan",
+  "city": "Jakarta",
+  "country": "Indonesia",
+  "tickets": [
+    { "ticketName": "Full Marathon", "price": 500000, "quantity": 2000 },
+    { "ticketName": "Half Marathon", "price": 350000, "quantity": 3000 }
+  ]
+}
+
+{
+  "title": "Java Jazz Festival",
+  "shortSummary": "International Jazz Festival",
+  "description": "Experience the best jazz performances from around the world.",
+  "category": "MUSIC",
+  "eventType": "OFFLINE",
+  "imageUrl": "https://example.com/javajazz.jpg",
+  "date": "2026-06-05",
+  "time": "16:00",
+  "totalCapacity": 10000,
+  "venue": "JIExpo Kemayoran",
+  "address": "Jl. Benyamin Suaeb",
+  "city": "Jakarta",
+  "country": "Indonesia",
+  "tickets": [
+    { "ticketName": "Daily Pass", "price": 800000, "quantity": 7000 },
+    { "ticketName": "VIP Pass", "price": 2000000, "quantity": 3000 }
+  ]
+}
+
+{
+  "title": "Kids Fun Fair 2026",
+  "shortSummary": "Fun day for kids",
+  "description": "Educational games and playgrounds for children.",
+  "category": "FAMILY",
+  "eventType": "OFFLINE",
+  "imageUrl": "https://example.com/familyfair.jpg",
+  "date": "2026-07-12",
+  "time": "10:00",
+  "totalCapacity": 1500,
+  "venue": "Taman Mini Indonesia Indah",
+  "address": "East Jakarta",
+  "city": "Jakarta",
+  "country": "Indonesia",
+  "tickets": [
+    { "ticketName": "Family Bundle (4 persons)", "price": 400000, "quantity": 800 },
+    { "ticketName": "Single Entry", "price": 120000, "quantity": 700 }
+  ]
+}
+
+ONLINE
+
+{
+  "title": "Digital Art Exhibition",
+  "shortSummary": "Explore NFT and Digital Art",
+  "description": "A virtual walkthrough of the latest digital masterpieces.",
+  "category": "ARTS_THEATRE",
+  "eventType": "ONLINE",
+  "imageUrl": "https://example.com/digitalart.jpg",
+  "date": "2026-08-15",
+  "time": "14:00",
+  "totalCapacity": 1000,
+  "platform": "Spatial.io",
+  "linkUrl": "https://spatial.io/exhibition/123",
+  "tickets": [
+    { "ticketName": "Virtual Entry", "price": 50000, "quantity": 1000 }
+  ]
+}
+
+{
+  "title": "Global Tech Festival Online",
+  "shortSummary": "Innovation showcase",
+  "description": "Live streaming of the biggest tech innovations this year.",
+  "category": "FESTIVALS",
+  "eventType": "ONLINE",
+  "imageUrl": "https://example.com/techfest.jpg",
+  "date": "2026-10-10",
+  "time": "09:00",
+  "totalCapacity": 5000,
+  "platform": "YouTube Live",
+  "linkUrl": "https://youtube.com/live/techfest2026",
+  "tickets": [
+    { "ticketName": "Free Access", "price": 100000, "quantity": 4000 },
+    { "ticketName": "Premium Q&A Access", "price": 100000, "quantity": 1000 }
+  ]
+}
+
+{
+  "title": "International Virtual Roast",
+  "shortSummary": "Laugh from your couch",
+  "description": "Global comedians roasting current trends live.",
+  "category": "COMEDY",
+  "eventType": "ONLINE",
+  "imageUrl": "https://example.com/virtualcomedy.jpg",
+  "date": "2026-11-20",
+  "time": "21:00",
+  "totalCapacity": 500,
+  "platform": "Google Meet",
+  "linkUrl": "https://meet.google.com/abc-defg-hij",
+  "tickets": [
+    { "ticketName": "General Admission", "price": 75000, "quantity": 500 }
+  ]
+}

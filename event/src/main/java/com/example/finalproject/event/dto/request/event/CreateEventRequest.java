@@ -1,7 +1,7 @@
 package com.example.finalproject.event.dto.request.event;
 
-import com.example.finalproject.event.model.EventCategories;
-import com.example.finalproject.event.model.EventType;
+import com.example.finalproject.event.model.event.EventCategories;
+import com.example.finalproject.event.model.event.EventType;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Min;

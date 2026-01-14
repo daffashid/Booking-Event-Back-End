@@ -1,6 +1,6 @@
 package com.example.finalproject.event.repository;
 
-import com.example.finalproject.event.model.LocationModel;
+import com.example.finalproject.event.model.event.LocationModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

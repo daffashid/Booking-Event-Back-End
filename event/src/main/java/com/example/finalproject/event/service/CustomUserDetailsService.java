@@ -1,6 +1,6 @@
 package com.example.finalproject.event.service;
 
-import com.example.finalproject.event.model.UserModel;
+import com.example.finalproject.event.model.user.UserModel;
 import com.example.finalproject.event.repository.UserRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;

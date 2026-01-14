@@ -1,9 +1,9 @@
 package com.example.finalproject.event.service.event;
 
 import com.example.finalproject.event.dto.response.event.*;
-import com.example.finalproject.event.model.EventModel;
-import com.example.finalproject.event.model.EventType;
-import com.example.finalproject.event.model.TicketModel;
+import com.example.finalproject.event.model.event.EventModel;
+import com.example.finalproject.event.model.event.EventType;
+import com.example.finalproject.event.model.event.TicketModel;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

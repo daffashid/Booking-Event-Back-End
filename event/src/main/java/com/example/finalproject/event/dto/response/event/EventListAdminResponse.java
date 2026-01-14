@@ -1,6 +1,6 @@
 package com.example.finalproject.event.dto.response.event;
 
-import com.example.finalproject.event.model.EventCategories;
+import com.example.finalproject.event.model.event.EventCategories;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

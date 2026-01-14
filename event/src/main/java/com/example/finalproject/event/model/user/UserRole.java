@@ -1,4 +1,4 @@
-package com.example.finalproject.event.model;
+package com.example.finalproject.event.model.user;
 
 public enum UserRole {
     ROLE_ADMIN,

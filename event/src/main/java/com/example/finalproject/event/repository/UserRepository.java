@@ -1,6 +1,6 @@
 package com.example.finalproject.event.repository;
 
-import com.example.finalproject.event.model.UserModel;
+import com.example.finalproject.event.model.user.UserModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

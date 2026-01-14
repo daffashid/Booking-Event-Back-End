@@ -4,9 +4,8 @@ import com.example.finalproject.event.config.SecurityUtil;
 import com.example.finalproject.event.dto.request.user.PatchUserRequest;
 import com.example.finalproject.event.dto.request.user.UpdateUserRequest;
 import com.example.finalproject.event.dto.response.user.UserProfileResponse;
-import com.example.finalproject.event.exception.user.UnauthorizedAccessException;
 import com.example.finalproject.event.exception.user.UserNotFoundException;
-import com.example.finalproject.event.model.UserModel;
+import com.example.finalproject.event.model.user.UserModel;
 import com.example.finalproject.event.repository.UserRepository;
 import org.springframework.stereotype.Service;
 

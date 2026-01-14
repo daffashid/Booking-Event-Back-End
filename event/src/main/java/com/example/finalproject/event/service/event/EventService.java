@@ -5,13 +5,12 @@ import com.example.finalproject.event.dto.request.event.PatchEventRequest;
 import com.example.finalproject.event.dto.request.event.UpdateEventRequest;
 import com.example.finalproject.event.dto.response.event.*;
 import com.example.finalproject.event.exception.event.*;
-import com.example.finalproject.event.model.*;
+import com.example.finalproject.event.model.event.*;
 import com.example.finalproject.event.repository.EventRepository;
 import com.example.finalproject.event.repository.LocationRepository;
 import com.example.finalproject.event.repository.OnlineEventRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -19,19 +18,16 @@ import java.util.List;
 @Service
 public class EventService {
 
-    private final ImageService imageService;
     private final EventRepository eventRepository;
     private final LocationRepository locationRepository;
     private final EventMapper eventMapper;
     private final OnlineEventRepository onlineEventRepository;
 
     public EventService(EventRepository eventRepository,
-                        ImageService imageService,
                         LocationRepository locationRepository,
                         EventMapper eventMapper,
                         OnlineEventRepository onlineEventRepository) {
         this.eventRepository = eventRepository;
-        this.imageService = imageService;
         this.locationRepository = locationRepository;
         this.eventMapper = eventMapper;
         this.onlineEventRepository = onlineEventRepository;

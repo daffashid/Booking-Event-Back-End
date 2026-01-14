@@ -1,12 +1,17 @@
-package com.example.finalproject.event.model;
+package com.example.finalproject.event.model.event;
 
 public enum EventCategories {
-    SPORTS("Sports"),
+    SPORTS ("Sports"),
     MUSIC("Music"),
     ARTS_THEATRE("Arts & Theatre"),
     FESTIVALS("Festivals"),
     FAMILY("Family"),
-    COMEDY("Comedy");
+    COMEDY("Comedy"),
+    CONFERENCE("Conference"),
+    WORKSHOP("Workshop"),
+    EXHIBITION("Exhibition"),
+    SEMINAR("Seminar"),
+    COMPETITION("Competition");
 
     private final String displayValue;
 

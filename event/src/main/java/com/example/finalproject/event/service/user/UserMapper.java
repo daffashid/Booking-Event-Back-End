@@ -1,7 +1,7 @@
 package com.example.finalproject.event.service.user;
 
 import com.example.finalproject.event.dto.response.user.UserProfileResponse;
-import com.example.finalproject.event.model.UserModel;
+import com.example.finalproject.event.model.user.UserModel;
 import org.springframework.stereotype.Component;
 
 @Component

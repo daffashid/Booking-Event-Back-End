@@ -1,7 +1,7 @@
 package com.example.finalproject.event.dto.response.event;
 
-import com.example.finalproject.event.model.EventCategories;
-import com.example.finalproject.event.model.EventType;
+import com.example.finalproject.event.model.event.EventCategories;
+import com.example.finalproject.event.model.event.EventType;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
