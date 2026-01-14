@@ -7,9 +7,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface EventRepository extends JpaRepository<EventModel, Long> {
     List<EventModel> findByCategory(EventCategories category);
+
+    Optional<EventModel> findByEventIdAndDeletedAtIsNull(Long eventId);
+    boolean existsByEventIdAndDeletedAtIsNull(Long eventId);
 
     /* =========================
        GET ALL ACTIVE EVENTS
@@ -18,6 +22,7 @@ public interface EventRepository extends JpaRepository<EventModel, Long> {
         SELECT DISTINCT e
         FROM EventModel e
         JOIN e.tickets t
+        WHERE e.deletedAt IS NULL
         GROUP BY e
         HAVING SUM(t.quantity) > 0
     """)
@@ -27,13 +32,14 @@ public interface EventRepository extends JpaRepository<EventModel, Long> {
        GET ACTIVE EVENTS BY CATEGORY
        ========================= */
     @Query("""
-    SELECT DISTINCT e
-    FROM EventModel e
-    LEFT JOIN e.tickets t
-    WHERE e.category = :category
-    GROUP BY e
-    HAVING COALESCE(SUM(t.quantity), 0) > 0
-""")
+        SELECT DISTINCT e
+        FROM EventModel e
+        LEFT JOIN e.tickets t
+        WHERE e.category = :category
+          AND e.deletedAt IS NULL
+        GROUP BY e
+        HAVING COALESCE(SUM(t.quantity), 0) > 0
+    """)
     List<EventModel> findActiveEventsByCategory(
             @Param("category") EventCategories category
     );

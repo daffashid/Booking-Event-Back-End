@@ -1,8 +1,8 @@
 package com.example.finalproject.event.service.booking;
 
-import com.example.finalproject.event.dto.response.Booking.BookingDetailResponse;
-import com.example.finalproject.event.dto.response.Booking.BookingItemResponse;
-import com.example.finalproject.event.dto.response.Booking.BookingResponse;
+import com.example.finalproject.event.dto.response.Booking.user.BookingDetailResponse;
+import com.example.finalproject.event.dto.response.Booking.user.BookingItemResponse;
+import com.example.finalproject.event.dto.response.Booking.user.BookingResponse;
 import com.example.finalproject.event.model.booking.BookingItemModel;
 import com.example.finalproject.event.model.booking.BookingModel;
 import com.example.finalproject.event.model.booking.BookingStatus;

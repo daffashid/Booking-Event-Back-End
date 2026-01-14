@@ -1,7 +1,4 @@
-package com.example.finalproject.event.dto.response.Booking;
-
-import lombok.Builder;
-import lombok.Data;
+package com.example.finalproject.event.dto.response.Booking.user;
 
 import lombok.Builder;
 import lombok.Data;

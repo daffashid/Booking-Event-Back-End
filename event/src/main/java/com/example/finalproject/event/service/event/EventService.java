@@ -4,8 +4,11 @@ import com.example.finalproject.event.dto.request.event.CreateEventRequest;
 import com.example.finalproject.event.dto.request.event.PatchEventRequest;
 import com.example.finalproject.event.dto.request.event.UpdateEventRequest;
 import com.example.finalproject.event.dto.response.event.*;
+import com.example.finalproject.event.exception.Booking.EventHasPaidBookingException;
 import com.example.finalproject.event.exception.event.*;
+import com.example.finalproject.event.model.booking.BookingStatus;
 import com.example.finalproject.event.model.event.*;
+import com.example.finalproject.event.repository.BookingRepository;
 import com.example.finalproject.event.repository.EventRepository;
 import com.example.finalproject.event.repository.LocationRepository;
 import com.example.finalproject.event.repository.OnlineEventRepository;
@@ -13,6 +16,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -22,15 +26,20 @@ public class EventService {
     private final LocationRepository locationRepository;
     private final EventMapper eventMapper;
     private final OnlineEventRepository onlineEventRepository;
+    private final BookingRepository bookingRepository;
 
-    public EventService(EventRepository eventRepository,
-                        LocationRepository locationRepository,
-                        EventMapper eventMapper,
-                        OnlineEventRepository onlineEventRepository) {
+    public EventService(
+            EventRepository eventRepository,
+            LocationRepository locationRepository,
+            EventMapper eventMapper,
+            OnlineEventRepository onlineEventRepository,
+            BookingRepository bookingRepository
+    ) {
         this.eventRepository = eventRepository;
         this.locationRepository = locationRepository;
         this.eventMapper = eventMapper;
         this.onlineEventRepository = onlineEventRepository;
+        this.bookingRepository = bookingRepository;
     }
 
     @Transactional
@@ -149,13 +158,27 @@ public class EventService {
         return response;
     }
 
+    @Transactional
     public void deleteEvent(Long eventId) {
-        if (!eventRepository.existsById(eventId)) {
-            throw new EventNotFoundException();
+
+        EventModel event = eventRepository
+                .findByEventIdAndDeletedAtIsNull(eventId)
+                .orElseThrow(EventNotFoundException::new);
+
+        boolean hasPaidBooking =
+                bookingRepository.existsByEvent_EventIdAndStatus(
+                        eventId,
+                        BookingStatus.PAID
+                );
+
+        if (hasPaidBooking) {
+            throw new EventHasPaidBookingException();
         }
 
-        eventRepository.deleteById(eventId);
+        event.setDeletedAt(LocalDateTime.now());
+        eventRepository.save(event);
     }
+
 
     // =========================
     // PUT (FULL UPDATE)

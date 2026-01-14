@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -48,6 +49,8 @@ public class EventModel {
     @Min(value = 0)
     private Integer totalCapacity;
 
+    private LocalDateTime deletedAt;
+
     // ===== OFFLINE =====
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location_id", nullable = true)
@@ -59,10 +62,11 @@ public class EventModel {
     private OnlineEventModel onlineEvent;
 
     @OneToMany(
-            mappedBy = "event",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
+            mappedBy = "event"
     )
     private List<TicketModel> tickets;
 
+    public boolean isDeleted() {
+        return deletedAt != null;
+    }
 }

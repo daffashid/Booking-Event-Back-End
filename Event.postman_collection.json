@@ -429,7 +429,7 @@
 							"urlencoded": []
 						},
 						"url": {
-							"raw": "http://localhost:8899/api/v1/events/8",
+							"raw": "http://localhost:8899/api/v1/events/1",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -439,7 +439,7 @@
 								"api",
 								"v1",
 								"events",
-								"8"
+								"1"
 							]
 						}
 					},
@@ -884,6 +884,84 @@
 								"v1",
 								"bookings",
 								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Booking Admin Action",
+			"item": [
+				{
+					"name": "Get All Bookings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8899/api/v1/admin/bookings",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8899",
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"bookings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Booking Detail",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8899/api/v1/admin/bookings/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8899",
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"bookings",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Booking Filter by Event",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8899/api/v1/admin/bookings?eventId=2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8899",
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"bookings"
+							],
+							"query": [
+								{
+									"key": "eventId",
+									"value": "2"
+								}
 							]
 						}
 					},

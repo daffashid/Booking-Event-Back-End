@@ -2,8 +2,8 @@ package com.example.finalproject.event.service.booking;
 
 import com.example.finalproject.event.config.SecurityUtil;
 import com.example.finalproject.event.dto.request.booking.CreateBookingRequest;
-import com.example.finalproject.event.dto.response.Booking.BookingResponse;
-import com.example.finalproject.event.dto.response.Booking.BookingDetailResponse;
+import com.example.finalproject.event.dto.response.Booking.user.BookingResponse;
+import com.example.finalproject.event.dto.response.Booking.user.BookingDetailResponse;
 import com.example.finalproject.event.exception.Booking.*;
 import com.example.finalproject.event.exception.event.EventNotFoundException;
 import com.example.finalproject.event.exception.user.UserNotFoundException;

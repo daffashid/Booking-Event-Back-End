@@ -1,4 +1,4 @@
-package com.example.finalproject.event.dto.response.Booking;
+package com.example.finalproject.event.dto.response.Booking.user;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
