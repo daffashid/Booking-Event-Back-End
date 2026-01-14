@@ -129,7 +129,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\":\"budisantoso@gmail.com\",\r\n    \"password\":\"Password123!\"\r\n}",
+							"raw": "{\r\n    \"email\":\"budisantoso@example.com\",\r\n    \"password\":\"Password123!\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -344,7 +344,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"title\": \"Stand Up Comedy Night\",\r\n  \"shortSummary\": \"Laugh all night\",\r\n  \"description\": \"Top Indonesian comedians performing live.\",\r\n  \"category\": \"COMEDY\",\r\n  \"eventType\": \"OFFLINE\",\r\n  \"imageUrl\": \"https://example.com/comedy.jpg\",\r\n  \"date\": \"2026-04-10\",\r\n  \"time\": \"20:00\",\r\n  \"totalCapacity\": 800,\r\n\r\n  \"venue\": \"Balai Sarbini\",\r\n  \"address\": \"Jl. Jend. Sudirman\",\r\n  \"city\": \"Jakarta\",\r\n  \"country\": \"Indonesia\",\r\n\r\n  \"tickets\": [\r\n    { \"ticketName\": \"Standard\", \"price\": 150000, \"quantity\": 600 },\r\n    { \"ticketName\": \"Front Row\", \"price\": 300000, \"quantity\": 200 }\r\n  ]\r\n}\r\n",
+							"raw": "{\r\n  \"title\": \"Ramayana Ballet Night\",\r\n  \"shortSummary\": \"Epic cultural performance\",\r\n  \"description\": \"Traditional dance drama depicting the epic story of Ramayana.\",\r\n  \"category\": \"ARTS_THEATRE\",\r\n  \"eventType\": \"OFFLINE\",\r\n  \"imageUrl\": \"https://example.com/ramayana.jpg\",\r\n  \"date\": \"2026-09-12\",\r\n  \"time\": \"19:30\",\r\n  \"totalCapacity\": 500,\r\n  \"venue\": \"Candi Prambanan\",\r\n  \"address\": \"Jl. Raya Solo-Yogyakarta\",\r\n  \"city\": \"Yogyakarta\",\r\n  \"country\": \"Indonesia\",\r\n  \"tickets\": [\r\n    { \"ticketName\": \"VIP (Front Row)\", \"price\": 500000, \"quantity\": 100 },\r\n    { \"ticketName\": \"Class 1\", \"price\": 300000, \"quantity\": 200 },\r\n    { \"ticketName\": \"Class 2\", \"price\": 150000, \"quantity\": 200 }\r\n  ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -385,7 +385,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"title\": \"Online Acting Workshop\",\r\n  \"shortSummary\": \"Acting from home\",\r\n  \"description\": \"Online acting workshop with professional actors.\",\r\n  \"category\": \"ARTS_THEATRE\",\r\n  \"eventType\": \"ONLINE\",\r\n  \"imageUrl\": \"https://example.com/acting.jpg\",\r\n  \"date\": \"2026-09-01\",\r\n  \"time\": \"19:00\",\r\n  \"totalCapacity\": 300,\r\n\r\n  \"platform\": \"Zoom\",\r\n  \"linkUrl\": \"https://zoom.us/j/987654321\",\r\n\r\n  \"tickets\": [\r\n    { \"ticketName\": \"Participant\", \"price\": 150000, \"quantity\": 300 }\r\n  ]\r\n}\r\n",
+							"raw": "{\r\n  \"title\": \"Pro Gaming Strategy Workshop\",\r\n  \"shortSummary\": \"Master the meta\",\r\n  \"description\": \"Learn advanced strategies from professional e-sports coaches.\",\r\n  \"category\": \"SPORTS\",\r\n  \"eventType\": \"ONLINE\",\r\n  \"imageUrl\": \"https://example.com/esports.jpg\",\r\n  \"date\": \"2026-05-30\",\r\n  \"time\": \"13:00\",\r\n  \"totalCapacity\": 1000,\r\n  \"platform\": \"Discord\",\r\n  \"linkUrl\": \"https://discord.gg/pro-workshop\",\r\n  \"tickets\": [\r\n    { \"ticketName\": \"Student Access\", \"price\": 50000, \"quantity\": 500 },\r\n    { \"ticketName\": \"Professional Access\", \"price\": 150000, \"quantity\": 500 }\r\n  ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -503,7 +503,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"title\": \"Online Coding Bootcamp 2026\",\r\n  \"shortSummary\": \"Learn backend with Spring Boot\",\r\n  \"description\": \"Intensive online backend bootcamp\",\r\n  \"category\": \"COMEDY\",\r\n  \"imageUrl\": \"https://example.com/bootcamp.jpg\",\r\n\r\n  \"date\": \"2026-08-10\",\r\n  \"time\": \"09:00\",\r\n  \"totalCapacity\": 500,\r\n\r\n  \"platform\": \"Zoom\",\r\n  \"linkUrl\": \"https://zoom.us/j/123456789\",\r\n\r\n  \"tickets\": [\r\n    {\r\n      \"ticketName\": \"Regular\",\r\n      \"price\": 150000,\r\n      \"quantity\": 100\r\n    },\r\n    {\r\n      \"ticketName\": \"Premium\",\r\n      \"price\": 300000,\r\n      \"quantity\": 200\r\n    }\r\n  ]\r\n}\r\n",
+							"raw": "{\r\n  \"title\": \"Online Coding Bootcamp 2026\",\r\n  \"shortSummary\": \"Learn backend with Spring Boot\",\r\n  \"description\": \"Intensive online backend bootcamp\",\r\n  \"category\": \"COMEDY\",\r\n  \"imageUrl\": \"https://example.com/bootcamp.jpg\",\r\n\r\n  \"date\": \"2026-08-10\",\r\n  \"time\": \"09:00\",\r\n  \"totalCapacity\": 500,\r\n\r\n  \"platform\": \"Zoom\",\r\n  \"linkUrl\": \"https://zoom.us/j/123456789\",\r\n\r\n  \"tickets\": [\r\n    {\r\n      \"ticketName\": \"Regular\",\r\n      \"price\": 150000,\r\n      \"quantity\": 10\r\n    },\r\n    {\r\n      \"ticketName\": \"Premium\",\r\n      \"price\": 300000,\r\n      \"quantity\": 10\r\n    }\r\n  ]\r\n}\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -511,7 +511,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8899/api/v1/events/4",
+							"raw": "http://localhost:8899/api/v1/events/5",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -521,7 +521,7 @@
 								"api",
 								"v1",
 								"events",
-								"4"
+								"5"
 							]
 						}
 					},
@@ -559,7 +559,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8899/api/v1/events/1",
+							"raw": "http://localhost:8899/api/v1/events/5",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -569,7 +569,7 @@
 								"api",
 								"v1",
 								"events",
-								"1"
+								"5"
 							]
 						}
 					},
@@ -688,7 +688,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\":\"daffashid28@gmail.com\",\r\n  \"firstName\": \"amas1\",\r\n  \"lastName\": \"sasa1\",\r\n  \"profilePicture\": \"https://example.com/event.jpg\"\r\n}",
+							"raw": "{\r\n    \"email\":\"sumasasa@gmail.com\",\r\n  \"firstName\": \"amas1\",\r\n  \"lastName\": \"sasa1\",\r\n  \"profilePicture\": \"https://example.com/event.jpg\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -741,6 +741,149 @@
 								"v1",
 								"users",
 								"me"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Booking",
+			"item": [
+				{
+					"name": "Create Booking",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"eventId\": 2,\r\n  \"tickets\": [\r\n    {\r\n      \"ticketId\": 5,\r\n      \"quantity\": 6\r\n    },\r\n    {\r\n      \"ticketId\": 4,\r\n      \"quantity\": 4\r\n    }\r\n  ]\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8899/api/v1/bookings",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8899",
+							"path": [
+								"api",
+								"v1",
+								"bookings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Pay Booking",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8899/api/v1/bookings/4/pay",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8899",
+							"path": [
+								"api",
+								"v1",
+								"bookings",
+								"4",
+								"pay"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Booking",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8899/api/v1/bookings/1/cancel",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8899",
+							"path": [
+								"api",
+								"v1",
+								"bookings",
+								"1",
+								"cancel"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Booking",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8899/api/v1/bookings/me",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8899",
+							"path": [
+								"api",
+								"v1",
+								"bookings",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Booking Detail",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8899/api/v1/bookings/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8899",
+							"path": [
+								"api",
+								"v1",
+								"bookings",
+								"1"
 							]
 						}
 					},
