@@ -12,9 +12,6 @@ import java.util.Optional;
 public interface EventRepository extends JpaRepository<EventModel, Long> {
     List<EventModel> findByCategory(EventCategories category);
 
-    Optional<EventModel> findByEventIdAndDeletedAtIsNull(Long eventId);
-    boolean existsByEventIdAndDeletedAtIsNull(Long eventId);
-
     /* =========================
        GET ALL ACTIVE EVENTS
        ========================= */
@@ -22,7 +19,6 @@ public interface EventRepository extends JpaRepository<EventModel, Long> {
         SELECT DISTINCT e
         FROM EventModel e
         JOIN e.tickets t
-        WHERE e.deletedAt IS NULL
         GROUP BY e
         HAVING SUM(t.quantity) > 0
     """)
@@ -36,7 +32,6 @@ public interface EventRepository extends JpaRepository<EventModel, Long> {
         FROM EventModel e
         LEFT JOIN e.tickets t
         WHERE e.category = :category
-          AND e.deletedAt IS NULL
         GROUP BY e
         HAVING COALESCE(SUM(t.quantity), 0) > 0
     """)
@@ -51,12 +46,10 @@ public interface EventRepository extends JpaRepository<EventModel, Long> {
 SELECT DISTINCT e
 FROM EventModel e
 LEFT JOIN e.tickets t
-WHERE e.deletedAt is NULL 
- AND(
+WHERE 
     LOWER(e.title) LIKE LOWER(CONCAT('%', :keyword, '%'))
     OR LOWER(e.description) LIKE LOWER(CONCAT('%', :keyword, '%'))
     OR LOWER(CAST(e.category AS string)) LIKE LOWER(CONCAT('%', :keyword, '%'))
- )
 GROUP BY e
 HAVING COALESCE(SUM(t.quantity), 0) > 0
 """)

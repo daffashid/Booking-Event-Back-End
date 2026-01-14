@@ -49,8 +49,6 @@ public class EventModel {
     @Min(value = 0)
     private Integer totalCapacity;
 
-    private LocalDateTime deletedAt;
-
     // ===== OFFLINE =====
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location_id", nullable = true)
@@ -62,11 +60,10 @@ public class EventModel {
     private OnlineEventModel onlineEvent;
 
     @OneToMany(
-            mappedBy = "event"
+            mappedBy = "event",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
     )
     private List<TicketModel> tickets;
-
-    public boolean isDeleted() {
-        return deletedAt != null;
-    }
 }

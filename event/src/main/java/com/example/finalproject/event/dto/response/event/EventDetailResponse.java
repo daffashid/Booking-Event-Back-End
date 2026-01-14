@@ -31,7 +31,7 @@ public class EventDetailResponse {
     private LocationResponse location;
     // ONLINE
     private OnlineEventResponse onlineEvent;
-    private List<TicketResponse> tickets;
+    private List<TicketDetailResponse> tickets;
 
     // tambahan khusus detail
     private Integer remainingCapacity;

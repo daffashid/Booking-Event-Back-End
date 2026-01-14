@@ -3,6 +3,7 @@ package com.example.finalproject.event.dto.request.event;
 import com.example.finalproject.event.model.event.EventCategories;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -34,7 +35,6 @@ public class PatchEventRequest {
 
     @Data
     public static class PatchTicketRequest {
-
         private String ticketName;
 
         @Min(value = 1, message = "Price must be greater than zero")
@@ -42,5 +42,7 @@ public class PatchEventRequest {
 
         @Min(value = 0, message = "Quantity must be greater than zero")
         private Integer quantity;
+
+        private Boolean delete;
     }
 }

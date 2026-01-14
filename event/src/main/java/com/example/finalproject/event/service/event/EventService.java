@@ -161,8 +161,7 @@ public class EventService {
     @Transactional
     public void deleteEvent(Long eventId) {
 
-        EventModel event = eventRepository
-                .findByEventIdAndDeletedAtIsNull(eventId)
+        EventModel event = eventRepository.findById(eventId)
                 .orElseThrow(EventNotFoundException::new);
 
         boolean hasPaidBooking =
@@ -175,9 +174,10 @@ public class EventService {
             throw new EventHasPaidBookingException();
         }
 
-        event.setDeletedAt(LocalDateTime.now());
-        eventRepository.save(event);
+        // HARD DELETE (event + tickets)
+        eventRepository.delete(event);
     }
+
 
 
     // =========================

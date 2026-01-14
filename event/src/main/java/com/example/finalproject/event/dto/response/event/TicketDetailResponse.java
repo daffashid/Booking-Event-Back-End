@@ -7,7 +7,8 @@ import java.math.BigDecimal;
 
 @Data
 @AllArgsConstructor
-public class TicketResponse {
+public class TicketDetailResponse {
+    private Long ticketId;
     private String ticketName;
     private BigDecimal price;
     private Integer quantity;

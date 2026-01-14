@@ -52,7 +52,6 @@ public class EventMapper {
     private List<TicketResponse> mapTickets(List<TicketModel> tickets) {
         return tickets.stream()
                 .map(t -> new TicketResponse(
-                        t.getTicketId(),
                         t.getTicketName(),
                         t.getPrice(),
                         t.getQuantity()
@@ -159,7 +158,7 @@ public class EventMapper {
                         event.getTickets() == null
                                 ? List.of()
                                 : event.getTickets().stream()
-                                .map(t -> new TicketResponse(
+                                .map(t -> new TicketDetailResponse(
                                         t.getTicketId(),
                                         t.getTicketName(),
                                         t.getPrice(),
@@ -170,4 +169,6 @@ public class EventMapper {
                 .warningMessage(null)
                 .build();
     }
+
+
 }
