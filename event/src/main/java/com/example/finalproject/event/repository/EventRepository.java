@@ -51,10 +51,12 @@ public interface EventRepository extends JpaRepository<EventModel, Long> {
 SELECT DISTINCT e
 FROM EventModel e
 LEFT JOIN e.tickets t
-WHERE
+WHERE e.deletedAt is NULL 
+ AND(
     LOWER(e.title) LIKE LOWER(CONCAT('%', :keyword, '%'))
     OR LOWER(e.description) LIKE LOWER(CONCAT('%', :keyword, '%'))
     OR LOWER(CAST(e.category AS string)) LIKE LOWER(CONCAT('%', :keyword, '%'))
+ )
 GROUP BY e
 HAVING COALESCE(SUM(t.quantity), 0) > 0
 """)
