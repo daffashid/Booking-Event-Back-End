@@ -52,6 +52,7 @@ public class EventMapper {
     private List<TicketResponse> mapTickets(List<TicketModel> tickets) {
         return tickets.stream()
                 .map(t -> new TicketResponse(
+                        t.getTicketId(),
                         t.getTicketName(),
                         t.getPrice(),
                         t.getQuantity()
@@ -159,6 +160,7 @@ public class EventMapper {
                                 ? List.of()
                                 : event.getTickets().stream()
                                 .map(t -> new TicketResponse(
+                                        t.getTicketId(),
                                         t.getTicketName(),
                                         t.getPrice(),
                                         t.getQuantity()
@@ -168,42 +170,4 @@ public class EventMapper {
                 .warningMessage(null)
                 .build();
     }
-
-
-    public EventListAdminResponse toAdminList(EventModel event) {
-
-        int remainingQuota = event.getTickets() == null
-                ? event.getTotalCapacity()
-                : event.getTickets().stream()
-                .mapToInt(TicketModel::getQuantity)
-                .sum();
-
-        int minPrice = event.getTickets() == null || event.getTickets().isEmpty()
-                ? 0
-                : event.getTickets().stream()
-                .mapToInt(t -> t.getPrice().intValue())
-                .min()
-                .orElse(0);
-
-        String venue = null;
-        String city = null;
-
-        if (event.getEventType() == EventType.OFFLINE && event.getLocation() != null) {
-            venue = event.getLocation().getVenue();
-            city = event.getLocation().getCity();
-        }
-
-        return new EventListAdminResponse(
-                event.getEventId(),
-                event.getTitle(),
-                event.getCategory(),
-                event.getDate(),
-                venue,
-                city,
-                minPrice,
-                event.getTotalCapacity(),
-                remainingQuota
-        );
-    }
-
 }
