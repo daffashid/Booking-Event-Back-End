@@ -8,9 +8,12 @@ import java.math.BigDecimal;
 @Data
 @Builder
 public class BookingItemResponse {
+
     private Long ticketId;
     private String ticketName;
     private Integer quantity;
     private BigDecimal price;
     private BigDecimal subtotal;
+
+    private String ticketNumber;
 }

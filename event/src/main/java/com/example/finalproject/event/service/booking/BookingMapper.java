@@ -6,6 +6,8 @@ import com.example.finalproject.event.dto.response.Booking.user.BookingResponse;
 import com.example.finalproject.event.model.booking.BookingItemModel;
 import com.example.finalproject.event.model.booking.BookingModel;
 import com.example.finalproject.event.model.booking.BookingStatus;
+import com.example.finalproject.event.model.event.EventModel;
+import com.example.finalproject.event.model.event.EventType;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -48,10 +50,25 @@ public class BookingMapper {
     public BookingDetailResponse toDetailResponse(BookingModel booking) {
 
         boolean paid = booking.getStatus() == BookingStatus.PAID;
+        EventModel event = booking.getEvent();
 
         return BookingDetailResponse.builder()
                 .bookingId(booking.getBookingId())
-                .eventTitle(booking.getEvent().getTitle())
+                .eventTitle(event.getTitle())
+
+                .eventDate(event.getDate())
+                .eventTime(event.getTime())
+                .venue(
+                        event.getEventType() == EventType.OFFLINE
+                                ? event.getLocation().getVenue()
+                                : null
+                )
+                .meetingUrl(
+                        event.getEventType() == EventType.ONLINE
+                                ? event.getOnlineEvent().getLinkUrl()
+                                : null
+                )
+
                 .items(
                         booking.getItems().stream()
                                 .map(item -> BookingItemResponse.builder()
@@ -63,7 +80,10 @@ public class BookingMapper {
                                                 item.getPriceSnapshot()
                                                         .multiply(BigDecimal.valueOf(item.getQuantity()))
                                         )
-                                        .build())
+                                        // 🔥 PER TICKET
+                                        .ticketNumber(String.valueOf(item.getBookingItemId()))
+                                        .build()
+                                )
                                 .toList()
                 )
                 .totalPrice(booking.getTotalPrice())
